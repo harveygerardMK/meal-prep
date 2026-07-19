@@ -5,9 +5,9 @@ import {
   PlanNotFoundError,
   regenerateCurrentPlan,
 } from "@/lib/planGenerator";
-import { buildGroceryList } from "@/lib/groceryList";
+import { groceryListFor } from "@/lib/groceryListFor.server";
 import { parseLocks, parseWeekPreferences } from "@/lib/validation";
-import { getSettings, getStaples } from "@/lib/dataStore";
+import { getSettings } from "@/lib/dataStore";
 
 function errorResponse(error: unknown, fallbackStatus = 500) {
   if (error instanceof PlanNotFoundError) {
@@ -17,14 +17,6 @@ function errorResponse(error: unknown, fallbackStatus = 500) {
   const status =
     error instanceof Error && /invalid/i.test(error.message) ? 400 : fallbackStatus;
   return NextResponse.json({ error: message }, { status });
-}
-
-async function groceryListFor(plan: Awaited<ReturnType<typeof getCurrentPlan>>) {
-  const [settings, staples] = await Promise.all([getSettings(), getStaples()]);
-  return buildGroceryList(plan, {
-    includeStaples: settings.includeStaplesInGroceryList,
-    staples: staples.items,
-  });
 }
 
 export async function GET() {

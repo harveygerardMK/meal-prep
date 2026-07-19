@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentPlan, PlanNotFoundError } from "@/lib/planGenerator";
-import { buildGroceryList } from "@/lib/groceryList";
+import { groceryListFor } from "@/lib/groceryListFor.server";
 import {
   buildShoppingHandoff,
   getInstacartConfig,
@@ -10,7 +10,7 @@ import { createInstacartProductsLink } from "@/lib/integrations/instacart/client
 export async function GET() {
   try {
     const plan = await getCurrentPlan();
-    const groceryList = buildGroceryList(plan);
+    const groceryList = await groceryListFor(plan);
     const config = getInstacartConfig();
     const handoff = buildShoppingHandoff(groceryList, config);
 

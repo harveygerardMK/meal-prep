@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentPlan, PlanNotFoundError } from "@/lib/planGenerator";
-import { buildGroceryList } from "@/lib/groceryList";
+import { groceryListFor } from "@/lib/groceryListFor.server";
 import { addMiscGroceryItem, removeMiscGroceryItem } from "@/lib/miscGrocery";
 
 function errorResponse(error: unknown, fallbackStatus = 500) {
@@ -18,7 +18,7 @@ async function groceryPayload() {
   return {
     weekOf: plan.weekOf,
     miscGrocery: plan.miscGrocery,
-    groceryList: buildGroceryList(plan),
+    groceryList: await groceryListFor(plan),
   };
 }
 
