@@ -111,6 +111,16 @@ export default function SettingsPage() {
       label: "Servings",
       hint: "Reference only — ingredient amounts in recipes aren't auto-scaled yet.",
     },
+    {
+      key: "cookEffortTarget",
+      label: "Default cook effort (1 easy – 5 hard)",
+      hint: "Default weekly slider for how elaborate dinners should feel.",
+    },
+    {
+      key: "noveltyTarget",
+      label: "Default originality (1 familiar – 5 new)",
+      hint: "Default weekly slider for repeats vs trying something different.",
+    },
   ];
 
   return (
@@ -152,6 +162,11 @@ export default function SettingsPage() {
                 id={inputId}
                 type="number"
                 min={1}
+                max={
+                  field.key === "cookEffortTarget" || field.key === "noveltyTarget"
+                    ? 5
+                    : undefined
+                }
                 value={settings[field.key]}
                 onChange={(e) =>
                   setSettings({ ...settings, [field.key]: Number(e.target.value) })

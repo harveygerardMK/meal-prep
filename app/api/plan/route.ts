@@ -6,7 +6,8 @@ import {
   regenerateCurrentPlan,
 } from "@/lib/planGenerator";
 import { buildGroceryList } from "@/lib/groceryList";
-import { parseLocks } from "@/lib/validation";
+import { parseLocks, parseWeekPreferences } from "@/lib/validation";
+import { getSettings } from "@/lib/dataStore";
 
 function errorResponse(error: unknown, fallbackStatus = 500) {
   if (error instanceof PlanNotFoundError) {
@@ -32,15 +33,20 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const action = body?.action === "ensure" ? "ensure" : "regenerate";
+    const settings = await getSettings();
+    const preferences = parseWeekPreferences(body?.preferences, {
+      cookEffortTarget: settings.cookEffortTarget,
+      noveltyTarget: settings.noveltyTarget,
+    });
 
     if (action === "ensure") {
-      const plan = await ensureCurrentPlan();
+      const plan = await ensureCurrentPlan(preferences);
       const groceryList = buildGroceryList(plan);
       return NextResponse.json({ plan, groceryList });
     }
 
     const locks = parseLocks(body?.locks);
-    const plan = await regenerateCurrentPlan(locks);
+    const plan = await regenerateCurrentPlan(locks, preferences);
     const groceryList = buildGroceryList(plan);
     return NextResponse.json({ plan, groceryList });
   } catch (error) {

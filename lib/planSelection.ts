@@ -1,4 +1,5 @@
-import type { Dinner, LunchOption } from "./types";
+import { scoreDinnerCandidate } from "./planning/scoreRecipe";
+import type { Dinner, LunchOption, WeekPreferences } from "./types";
 
 export function shuffle<T>(arr: T[]): T[] {
   const copy = [...arr];
@@ -9,12 +10,27 @@ export function shuffle<T>(arr: T[]): T[] {
   return copy;
 }
 
+function rankDinners(
+  dinners: Dinner[],
+  preferences: WeekPreferences,
+  avoidIds: Set<string>
+): Dinner[] {
+  return [...dinners].sort((a, b) => {
+    const scoreDiff =
+      scoreDinnerCandidate(a, preferences, avoidIds) -
+      scoreDinnerCandidate(b, preferences, avoidIds);
+    if (scoreDiff !== 0) return scoreDiff;
+    return a.id.localeCompare(b.id);
+  });
+}
+
 export function pickDinners(
   allDinners: Dinner[],
   count: number,
   maxCookMinutes: number,
   avoidIds: Set<string>,
-  locked: (string | null)[]
+  locked: (string | null)[],
+  preferences: WeekPreferences = { cookEffortTarget: 3, noveltyTarget: 3 }
 ): string[] {
   const result: string[] = locked.slice(0, count).map((id) => id ?? "");
   while (result.length < count) result.push("");
@@ -31,8 +47,16 @@ export function pickDinners(
   }
 
   const withinTime = allDinners.filter((d) => d.cookMinutes <= maxCookMinutes);
-  const fresh = shuffle(withinTime.filter((d) => !avoidIds.has(d.id) && !usedIds.has(d.id)));
-  const fallback = shuffle(withinTime.filter((d) => !usedIds.has(d.id)));
+  const fresh = rankDinners(
+    withinTime.filter((d) => !avoidIds.has(d.id) && !usedIds.has(d.id)),
+    preferences,
+    avoidIds
+  );
+  const fallback = rankDinners(
+    withinTime.filter((d) => !usedIds.has(d.id)),
+    preferences,
+    avoidIds
+  );
 
   for (let i = 0; i < count; i++) {
     if (result[i]) continue;

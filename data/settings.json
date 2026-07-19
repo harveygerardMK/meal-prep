@@ -2,5 +2,7 @@
   "dinnersPerWeek": 4,
   "maxCookMinutes": 40,
   "noRepeatWeeks": 3,
-  "servings": 4
+  "servings": 4,
+  "cookEffortTarget": 3,
+  "noveltyTarget": 3
 }

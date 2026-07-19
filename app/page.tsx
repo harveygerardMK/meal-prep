@@ -5,7 +5,7 @@ import Link from "next/link";
 import { DinnerCard } from "./components/DinnerCard";
 import { LunchCard } from "./components/LunchCard";
 import { GroceryListView } from "./components/GroceryListView";
-import type { ResolvedWeekPlan, Locks } from "@/lib/types";
+import type { ResolvedWeekPlan, Locks, WeekPreferences } from "@/lib/types";
 import type { GrocerySection } from "@/lib/groceryList";
 
 type PlanResponse = { plan: ResolvedWeekPlan; groceryList: GrocerySection[] };
@@ -15,6 +15,10 @@ export default function Home() {
   const [lockedDinners, setLockedDinners] = useState<boolean[]>([]);
   const [lockedGirl, setLockedGirl] = useState(false);
   const [lockedBoy, setLockedBoy] = useState(false);
+  const [preferences, setPreferences] = useState<WeekPreferences>({
+    cookEffortTarget: 3,
+    noveltyTarget: 3,
+  });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
@@ -27,6 +31,7 @@ export default function Home() {
       setLockedDinners(json.plan.locks.dinners.map((id: string | null) => id !== null));
       setLockedGirl(json.plan.locks.girlLunch !== null);
       setLockedBoy(json.plan.locks.boyLunch !== null);
+      setPreferences(json.plan.preferences);
     }
 
     async function load() {
@@ -77,7 +82,7 @@ export default function Home() {
       const res = await fetch("/api/plan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "regenerate", locks }),
+        body: JSON.stringify({ action: "regenerate", locks, preferences }),
       });
       const json = await res.json();
       if (!res.ok) {
@@ -87,6 +92,7 @@ export default function Home() {
       setLockedDinners(json.plan.locks.dinners.map((id: string | null) => id !== null));
       setLockedGirl(json.plan.locks.girlLunch !== null);
       setLockedBoy(json.plan.locks.boyLunch !== null);
+      setPreferences(json.plan.preferences);
       setStatus("Plan updated — unlocked meals were reshuffled.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to regenerate plan");
@@ -157,6 +163,53 @@ export default function Home() {
           {status}
         </p>
       )}
+
+      <section className="mb-8 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <h2 className="mb-3 text-lg font-semibold">This week&apos;s mix</h2>
+        <p className="mb-4 text-xs text-zinc-500 dark:text-zinc-400">
+          Overrides settings defaults for the next regenerate.
+        </p>
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="cook-effort" className="mb-1 block text-sm font-medium">
+              Cook effort: {preferences.cookEffortTarget} (easy → hard)
+            </label>
+            <input
+              id="cook-effort"
+              type="range"
+              min={1}
+              max={5}
+              value={preferences.cookEffortTarget}
+              onChange={(e) =>
+                setPreferences({
+                  ...preferences,
+                  cookEffortTarget: Number(e.target.value),
+                })
+              }
+              className="w-full"
+            />
+          </div>
+          <div>
+            <label htmlFor="novelty" className="mb-1 block text-sm font-medium">
+              Originality: {preferences.noveltyTarget} (familiar → new)
+            </label>
+            <input
+              id="novelty"
+              type="range"
+              min={1}
+              max={5}
+              value={preferences.noveltyTarget}
+              onChange={(e) =>
+                setPreferences({
+                  ...preferences,
+                  noveltyTarget: Number(e.target.value),
+                })
+              }
+              className="w-full"
+            />
+          </div>
+        </div>
+      </section>
 
       <section className="mb-8">
         <h2 className="mb-3 text-lg font-semibold">Dinners</h2>

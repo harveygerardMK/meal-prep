@@ -1,8 +1,16 @@
-import type { Locks, Settings } from "./types";
+import type { Locks, Settings, WeekPreferences } from "./types";
 
 function requirePositiveInt(value: unknown, field: string): number {
   if (typeof value !== "number" || !Number.isInteger(value) || value < 1) {
     throw new Error(`Invalid ${field}: expected a positive integer`);
+  }
+  return value;
+}
+
+function requireScore(value: unknown, field: string, fallback = 3): number {
+  if (value === undefined || value === null) return fallback;
+  if (typeof value !== "number" || !Number.isInteger(value) || value < 1 || value > 5) {
+    throw new Error(`Invalid ${field}: expected an integer from 1 to 5`);
   }
   return value;
 }
@@ -25,6 +33,31 @@ export function parseSettings(input: unknown): Settings {
     maxCookMinutes: requirePositiveInt(body.maxCookMinutes, "maxCookMinutes"),
     noRepeatWeeks: requirePositiveInt(body.noRepeatWeeks, "noRepeatWeeks"),
     servings: requirePositiveInt(body.servings, "servings"),
+    cookEffortTarget: requireScore(body.cookEffortTarget, "cookEffortTarget"),
+    noveltyTarget: requireScore(body.noveltyTarget, "noveltyTarget"),
+  };
+}
+
+export function parseWeekPreferences(
+  input: unknown,
+  fallback: WeekPreferences
+): WeekPreferences {
+  if (input === undefined || input === null) return fallback;
+  if (!input || typeof input !== "object") {
+    throw new Error("Invalid preferences: expected an object");
+  }
+  const body = input as Record<string, unknown>;
+  return {
+    cookEffortTarget: requireScore(
+      body.cookEffortTarget,
+      "cookEffortTarget",
+      fallback.cookEffortTarget
+    ),
+    noveltyTarget: requireScore(
+      body.noveltyTarget,
+      "noveltyTarget",
+      fallback.noveltyTarget
+    ),
   };
 }
 

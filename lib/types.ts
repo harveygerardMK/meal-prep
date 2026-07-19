@@ -64,11 +64,18 @@ export type CatalogData = {
   recipes: CatalogRecipe[];
 };
 
+export type WeekPreferences = {
+  cookEffortTarget: number;
+  noveltyTarget: number;
+};
+
 export type Settings = {
   dinnersPerWeek: number;
   maxCookMinutes: number;
   noRepeatWeeks: number;
   servings: number;
+  cookEffortTarget: number;
+  noveltyTarget: number;
 };
 
 export type Locks = {
@@ -83,6 +90,7 @@ export type WeekPlan = {
   girlLunch: string;
   boyLunch: string;
   locks: Locks;
+  preferences?: WeekPreferences;
 };
 
 export type History = {
@@ -95,4 +103,5 @@ export type ResolvedWeekPlan = {
   girlLunch: LunchOption;
   boyLunch: LunchOption;
   locks: Locks;
+  preferences: WeekPreferences;
 };

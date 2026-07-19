@@ -14,6 +14,7 @@ import type {
   WeekPlan,
   ResolvedWeekPlan,
   History,
+  WeekPreferences,
 } from "./types";
 
 export class PlanNotFoundError extends Error {
@@ -59,7 +60,11 @@ function emptyLocks(dinnersPerWeek: number): Locks {
   };
 }
 
-async function buildPlan(weekOf: string, locks: Locks): Promise<WeekPlan> {
+async function buildPlan(
+  weekOf: string,
+  locks: Locks,
+  preferences: WeekPreferences
+): Promise<WeekPlan> {
   const [recipes, settings, history] = await Promise.all([
     getRecipes(),
     getSettings(),
@@ -75,12 +80,20 @@ async function buildPlan(weekOf: string, locks: Locks): Promise<WeekPlan> {
     settings.dinnersPerWeek,
     settings.maxCookMinutes,
     avoidDinners,
-    locks.dinners
+    locks.dinners,
+    preferences
   );
   const girlLunch = pickLunch(recipes.girlLunches, avoidGirl, locks.girlLunch);
   const boyLunch = pickLunch(recipes.boyLunches, avoidBoy, locks.boyLunch);
 
-  const plan: WeekPlan = { weekOf, dinners, girlLunch, boyLunch, locks };
+  const plan: WeekPlan = {
+    weekOf,
+    dinners,
+    girlLunch,
+    boyLunch,
+    locks,
+    preferences,
+  };
   await upsertWeekPlan(plan);
   return plan;
 }
@@ -119,6 +132,10 @@ async function resolvePlan(plan: WeekPlan): Promise<ResolvedWeekPlan> {
     girlLunch,
     boyLunch,
     locks: plan.locks,
+    preferences: plan.preferences ?? {
+      cookEffortTarget: settings.cookEffortTarget,
+      noveltyTarget: settings.noveltyTarget,
+    },
   };
 }
 
@@ -133,19 +150,37 @@ export async function getCurrentPlan(): Promise<ResolvedWeekPlan> {
 }
 
 /** Explicit mutation: create this week's plan when missing. */
-export async function ensureCurrentPlan(): Promise<ResolvedWeekPlan> {
+export async function ensureCurrentPlan(
+  preferences?: WeekPreferences
+): Promise<ResolvedWeekPlan> {
   const weekOf = weekStartISO();
   const existing = await getWeekPlan(weekOf);
   if (existing) {
     return resolvePlan(existing);
   }
   const settings = await getSettings();
-  const plan = await buildPlan(weekOf, emptyLocks(settings.dinnersPerWeek));
+  const prefs = preferences ?? {
+    cookEffortTarget: settings.cookEffortTarget,
+    noveltyTarget: settings.noveltyTarget,
+  };
+  const plan = await buildPlan(
+    weekOf,
+    emptyLocks(settings.dinnersPerWeek),
+    prefs
+  );
   return resolvePlan(plan);
 }
 
-export async function regenerateCurrentPlan(locks: Locks): Promise<ResolvedWeekPlan> {
+export async function regenerateCurrentPlan(
+  locks: Locks,
+  preferences?: WeekPreferences
+): Promise<ResolvedWeekPlan> {
   const weekOf = weekStartISO();
-  const plan = await buildPlan(weekOf, locks);
+  const settings = await getSettings();
+  const prefs = preferences ?? {
+    cookEffortTarget: settings.cookEffortTarget,
+    noveltyTarget: settings.noveltyTarget,
+  };
+  const plan = await buildPlan(weekOf, locks, prefs);
   return resolvePlan(plan);
 }

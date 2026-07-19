@@ -15,6 +15,8 @@ describe("parseSettings", () => {
       maxCookMinutes: 40,
       noRepeatWeeks: 3,
       servings: 4,
+      cookEffortTarget: 3,
+      noveltyTarget: 3,
     });
   });
 
