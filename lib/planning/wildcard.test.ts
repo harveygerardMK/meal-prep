@@ -44,7 +44,7 @@ describe("planMonthlyWildcard", () => {
     });
 
     expect(result).toEqual({
-      nextState: { lastWildcardMonth: "2026-07" },
+      nextState: { lastWildcardMonth: null },
     });
   });
 
@@ -68,7 +68,7 @@ describe("planMonthlyWildcard", () => {
     });
 
     expect(result).toEqual({
-      nextState: { lastWildcardMonth: "2026-07" },
+      nextState: { lastWildcardMonth: null },
     });
   });
 });

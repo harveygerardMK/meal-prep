@@ -41,12 +41,15 @@ export function planMonthlyWildcard({
       recipe.status === "active" &&
       recipe.wildcard === true
   );
-  const nextState = { lastWildcardMonth: month };
 
   if (eligible.length === 0 || slotIndex === null) {
-    return { nextState };
+    return { nextState: state };
   }
 
   const recipe = eligible[Math.floor(random() * eligible.length)];
-  return { recipeId: recipe.id, slotIndex, nextState };
+  return {
+    recipeId: recipe.id,
+    slotIndex,
+    nextState: { lastWildcardMonth: month },
+  };
 }

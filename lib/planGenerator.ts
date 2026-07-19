@@ -169,7 +169,7 @@ async function buildPlan(
     state: wildcardState,
     candidates: catalog,
     // Queue picks have priority. Only inject the wildcard into a slot left
-    // empty by that pass, so a full queue skips the wildcard for this month.
+    // empty by that pass, so a full queue skips it this week and retries later.
     slotIndex: firstSlotAfterQueue(
       recipes.dinners,
       settings.dinnersPerWeek,
