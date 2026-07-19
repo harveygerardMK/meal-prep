@@ -21,19 +21,36 @@ export default function Home() {
 
   useEffect(() => {
     let cancelled = false;
+    async function applyPlan(json: PlanResponse) {
+      if (cancelled) return;
+      setData(json);
+      setLockedDinners(json.plan.locks.dinners.map((id: string | null) => id !== null));
+      setLockedGirl(json.plan.locks.girlLunch !== null);
+      setLockedBoy(json.plan.locks.boyLunch !== null);
+    }
+
     async function load() {
       setError(null);
       try {
         const res = await fetch("/api/plan");
         const json = await res.json();
+        if (res.status === 404 && json.code === "NO_PLAN") {
+          const created = await fetch("/api/plan", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "ensure" }),
+          });
+          const createdJson = await created.json();
+          if (!created.ok) {
+            throw new Error(createdJson.error || "Failed to create this week's plan");
+          }
+          await applyPlan(createdJson as PlanResponse);
+          return;
+        }
         if (!res.ok) {
           throw new Error(json.error || "Failed to load this week's plan");
         }
-        if (cancelled) return;
-        setData(json as PlanResponse);
-        setLockedDinners(json.plan.locks.dinners.map((id: string | null) => id !== null));
-        setLockedGirl(json.plan.locks.girlLunch !== null);
-        setLockedBoy(json.plan.locks.boyLunch !== null);
+        await applyPlan(json as PlanResponse);
       } catch (err) {
         if (!cancelled) {
           setError(err instanceof Error ? err.message : "Failed to load this week's plan");
@@ -60,7 +77,7 @@ export default function Home() {
       const res = await fetch("/api/plan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ locks }),
+        body: JSON.stringify({ action: "regenerate", locks }),
       });
       const json = await res.json();
       if (!res.ok) {

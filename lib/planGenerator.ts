@@ -1,4 +1,10 @@
-import { getRecipes, getSettings, getHistory, saveHistory } from "./dataStore";
+import {
+  getRecipes,
+  getSettings,
+  getHistory,
+  upsertWeekPlan,
+  getWeekPlan,
+} from "./dataStore";
 import { weekStartISO } from "./week";
 import { pickDinners, pickLunch } from "./planSelection";
 import type {
@@ -7,6 +13,13 @@ import type {
   ResolvedWeekPlan,
   History,
 } from "./types";
+
+export class PlanNotFoundError extends Error {
+  constructor(weekOf: string) {
+    super(`No plan for week ${weekOf}`);
+    this.name = "PlanNotFoundError";
+  }
+}
 
 function recentWeeks(history: History, beforeWeekOf: string, count: number): WeekPlan[] {
   return history.weeks
@@ -66,10 +79,7 @@ async function buildPlan(weekOf: string, locks: Locks): Promise<WeekPlan> {
   const boyLunch = pickLunch(recipes.boyLunches, avoidBoy, locks.boyLunch);
 
   const plan: WeekPlan = { weekOf, dinners, girlLunch, boyLunch, locks };
-
-  const otherWeeks = history.weeks.filter((w) => w.weekOf !== weekOf);
-  await saveHistory({ weeks: [...otherWeeks, plan] });
-
+  await upsertWeekPlan(plan);
   return plan;
 }
 
@@ -105,12 +115,23 @@ async function resolvePlan(plan: WeekPlan): Promise<ResolvedWeekPlan> {
   };
 }
 
+/** Read-only: never creates a plan. */
 export async function getCurrentPlan(): Promise<ResolvedWeekPlan> {
   const weekOf = weekStartISO();
-  const history = await getHistory();
-  const existing = history.weeks.find((w) => w.weekOf === weekOf);
-  if (existing) return resolvePlan(existing);
+  const existing = await getWeekPlan(weekOf);
+  if (!existing) {
+    throw new PlanNotFoundError(weekOf);
+  }
+  return resolvePlan(existing);
+}
 
+/** Explicit mutation: create this week's plan when missing. */
+export async function ensureCurrentPlan(): Promise<ResolvedWeekPlan> {
+  const weekOf = weekStartISO();
+  const existing = await getWeekPlan(weekOf);
+  if (existing) {
+    return resolvePlan(existing);
+  }
   const settings = await getSettings();
   const plan = await buildPlan(weekOf, emptyLocks(settings.dinnersPerWeek));
   return resolvePlan(plan);

@@ -33,6 +33,20 @@ export default function SettingsPage() {
     };
   }, []);
 
+  async function logout() {
+    setError(null);
+    try {
+      const res = await fetch("/api/auth/logout", { method: "POST" });
+      if (!res.ok) {
+        const json = await res.json();
+        throw new Error(json.error || "Failed to log out");
+      }
+      window.location.href = "/login";
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to log out");
+    }
+  }
+
   async function save() {
     if (!settings) return;
     setBusy(true);
@@ -103,12 +117,21 @@ export default function SettingsPage() {
     <main className="mx-auto w-full max-w-lg px-6 py-10">
       <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold">Settings</h1>
-        <Link
-          href="/"
-          className="rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900"
-        >
-          Back to plan
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            href="/"
+            className="rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900"
+          >
+            Back to plan
+          </Link>
+          <button
+            type="button"
+            onClick={logout}
+            className="rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900"
+          >
+            Log out
+          </button>
+        </div>
       </div>
 
       {error && (
