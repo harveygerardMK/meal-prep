@@ -1,0 +1,25 @@
+{
+  "weeks": [
+    {
+      "weekOf": "2026-07-13",
+      "dinners": [
+        "shoyu-chicken",
+        "sloppy-joes-tots",
+        "gnocchi-sausage-peppers",
+        "turkish-pasta"
+      ],
+      "girlLunch": "chicken-sausage-veggie-medley",
+      "boyLunch": "pasta-salad-lunchbox",
+      "locks": {
+        "dinners": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "girlLunch": null,
+        "boyLunch": null
+      }
+    }
+  ]
+}

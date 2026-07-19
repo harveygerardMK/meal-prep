@@ -1,0 +1,331 @@
+{
+  "servings": 4,
+  "dinners": [
+    {
+      "id": "chicken-salad",
+      "name": "Chicken Salad",
+      "protein": "chicken",
+      "cookMinutes": 15,
+      "tags": ["favorite", "no-cook"],
+      "ingredients": ["1 rotisserie chicken, shredded", "3 stalks celery, diced", "1/2 cup mayo", "1/4 red onion, diced", "Bread or croissants for serving"]
+    },
+    {
+      "id": "tacos",
+      "name": "Tacos",
+      "protein": "beef",
+      "cookMinutes": 25,
+      "tags": ["favorite", "weeknight"],
+      "ingredients": ["1 lb ground beef", "Taco seasoning", "8 small tortillas", "1 cup shredded cheese", "1 cup shredded lettuce", "1/2 cup salsa", "Sour cream"]
+    },
+    {
+      "id": "leftovers-night",
+      "name": "Leftovers Night",
+      "protein": "varies",
+      "cookMinutes": 5,
+      "tags": ["no-cook", "low-effort"],
+      "ingredients": []
+    },
+    {
+      "id": "szechuan-noodles",
+      "name": "Szechuan Noodles",
+      "protein": "pork",
+      "cookMinutes": 25,
+      "tags": ["favorite", "spicy"],
+      "ingredients": ["12 oz noodles (udon or lo mein)", "1/2 lb ground pork", "3 tbsp chili oil", "3 cloves garlic, minced", "2 tbsp soy sauce", "1 tbsp black vinegar", "2 scallions, sliced"]
+    },
+    {
+      "id": "cacio-e-pepe",
+      "name": "Cacio e Pepe",
+      "protein": "vegetarian",
+      "cookMinutes": 20,
+      "tags": ["favorite", "quick", "vegetarian"],
+      "ingredients": ["1 lb spaghetti", "1 1/2 cups grated pecorino romano", "2 tsp coarse black pepper", "4 tbsp butter"]
+    },
+    {
+      "id": "garlic-ramen",
+      "name": "Garlic Ramen",
+      "protein": "egg",
+      "cookMinutes": 20,
+      "tags": ["favorite", "quick"],
+      "ingredients": ["4 packs ramen noodles", "6 cloves garlic, sliced", "4 eggs", "2 tbsp soy sauce", "2 scallions, sliced", "Chili crisp (optional)"]
+    },
+    {
+      "id": "sloppy-joes-tots",
+      "name": "Sloppy Joes & Tots",
+      "protein": "beef",
+      "cookMinutes": 30,
+      "tags": ["favorite", "kid-friendly", "freezer-friendly"],
+      "ingredients": ["1 lb ground beef", "1 cup sloppy joe sauce", "4 hamburger buns", "1 bag frozen tater tots"]
+    },
+    {
+      "id": "thai-meatball-soup",
+      "name": "Thai Meatball Soup",
+      "protein": "pork",
+      "cookMinutes": 35,
+      "tags": ["favorite", "soup"],
+      "ingredients": ["1 lb ground pork meatballs", "1 can coconut milk", "2 tbsp red curry paste", "4 oz rice noodles", "1 cup baby spinach", "Juice of 1 lime", "Cilantro"]
+    },
+    {
+      "id": "chicken-enchiladas",
+      "name": "Chicken Enchiladas",
+      "protein": "chicken",
+      "cookMinutes": 40,
+      "tags": ["favorite", "make-ahead"],
+      "ingredients": ["3 cups shredded rotisserie chicken", "10 corn tortillas", "2 cups enchilada sauce", "2 cups shredded cheese", "1/2 cup diced onion"]
+    },
+    {
+      "id": "chicken-noodle-soup",
+      "name": "Chicken Noodle Soup",
+      "protein": "chicken",
+      "cookMinutes": 35,
+      "tags": ["favorite", "soup", "cold-weather"],
+      "ingredients": ["1 lb chicken breast", "8 cups chicken stock", "2 carrots, sliced", "2 stalks celery, sliced", "6 oz egg noodles"]
+    },
+    {
+      "id": "lasagna",
+      "name": "Lasagna",
+      "protein": "beef",
+      "cookMinutes": 75,
+      "tags": ["favorite", "weekend", "make-ahead"],
+      "ingredients": ["1 lb ground beef", "1 box lasagna noodles", "15 oz ricotta", "3 cups shredded mozzarella", "24 oz marinara sauce", "1 egg"]
+    },
+    {
+      "id": "lettuce-wraps",
+      "name": "Chicken Lettuce Wraps",
+      "protein": "chicken",
+      "cookMinutes": 25,
+      "tags": ["favorite", "light"],
+      "ingredients": ["1 lb ground chicken", "1 head butter lettuce", "3 tbsp hoisin sauce", "1 can water chestnuts, diced", "2 cloves garlic, minced", "2 scallions, sliced"]
+    },
+    {
+      "id": "carne-asada",
+      "name": "Carne Asada",
+      "protein": "beef",
+      "cookMinutes": 30,
+      "tags": ["favorite", "grill"],
+      "ingredients": ["1.5 lb flank steak", "Juice of 3 limes", "1/4 cup cilantro, chopped", "3 cloves garlic, minced", "8 small tortillas"]
+    },
+    {
+      "id": "keema-naan",
+      "name": "Keema & Naan",
+      "protein": "beef",
+      "cookMinutes": 35,
+      "tags": ["favorite", "curry"],
+      "ingredients": ["1 lb ground beef or lamb", "1 cup frozen peas", "1 onion, diced", "2 tbsp curry powder", "1 can crushed tomatoes", "4 naan breads"]
+    },
+    {
+      "id": "stir-fry",
+      "name": "Chicken Stir Fry",
+      "protein": "chicken",
+      "cookMinutes": 25,
+      "tags": ["favorite", "quick", "vegetable-heavy"],
+      "ingredients": ["1 lb chicken breast, sliced", "1 head broccoli, cut into florets", "1 bell pepper, sliced", "3 tbsp soy sauce", "1 tbsp cornstarch", "2 cups cooked rice"]
+    },
+    {
+      "id": "mezze-bowl",
+      "name": "Mezze Bowl (Falafel)",
+      "protein": "vegetarian",
+      "cookMinutes": 30,
+      "tags": ["favorite", "vegetarian", "make-ahead"],
+      "ingredients": ["1 bag frozen falafel", "1 cup hummus", "1 cucumber, diced", "1/2 cup feta", "4 pitas", "1/2 cup tzatziki"]
+    },
+    {
+      "id": "burrito-bowls",
+      "name": "Burrito Bowls",
+      "protein": "beef",
+      "cookMinutes": 30,
+      "tags": ["favorite", "customizable"],
+      "ingredients": ["1 lb ground beef", "2 cups cooked rice", "1 can black beans", "2 avocados", "1 bell pepper, diced", "1/2 onion, diced", "1 cup shredded cheese"]
+    },
+    {
+      "id": "chicken-picatta",
+      "name": "Chicken Picatta & Rice Pilaf",
+      "protein": "chicken",
+      "cookMinutes": 35,
+      "tags": ["favorite"],
+      "ingredients": ["4 chicken breasts", "3 tbsp capers", "Juice of 2 lemons", "4 tbsp butter", "1 cup rice pilaf"]
+    },
+    {
+      "id": "pork-tenderloin-carrots",
+      "name": "Pork Tenderloin & Roasted Carrots",
+      "protein": "pork",
+      "cookMinutes": 40,
+      "tags": ["favorite", "roasted"],
+      "ingredients": ["1.5 lb pork tenderloin", "1 lb carrots", "Olive oil", "Fresh rosemary or thyme"]
+    },
+    {
+      "id": "steak-pots-arugula",
+      "name": "Steak, Potatoes & Arugula",
+      "protein": "beef",
+      "cookMinutes": 35,
+      "tags": ["favorite"],
+      "ingredients": ["1.5 lb flank or ribeye steak", "1.5 lb baby potatoes", "2 cups arugula", "Olive oil", "Balsamic glaze"]
+    },
+    {
+      "id": "gnocchi-sausage-peppers",
+      "name": "Gnocchi, Sausage & Peppers",
+      "protein": "pork",
+      "cookMinutes": 30,
+      "tags": ["favorite"],
+      "ingredients": ["1 lb potato gnocchi", "1 lb italian sausage links, sliced", "2 bell peppers, sliced", "1/2 onion, sliced", "2 tbsp olive oil"]
+    },
+    {
+      "id": "shoyu-chicken",
+      "name": "Shoyu Chicken",
+      "protein": "chicken",
+      "cookMinutes": 35,
+      "tags": ["favorite"],
+      "ingredients": ["2 lb chicken thighs", "1/2 cup soy sauce", "1/4 cup brown sugar", "2 in ginger, sliced", "4 cloves garlic", "2 cups cooked rice"]
+    },
+    {
+      "id": "corn-chowder",
+      "name": "Corn Chowder",
+      "protein": "vegetarian",
+      "cookMinutes": 35,
+      "tags": ["favorite", "soup", "cold-weather"],
+      "ingredients": ["4 cups corn kernels", "2 potatoes, diced", "4 slices bacon", "1 cup heavy cream", "4 cups vegetable stock", "Tortillas for serving"]
+    },
+    {
+      "id": "french-onion-soup",
+      "name": "French Onion Soup",
+      "protein": "vegetarian",
+      "cookMinutes": 60,
+      "tags": ["favorite", "soup", "weekend"],
+      "ingredients": ["4 large onions, sliced", "6 cups beef broth", "1 baguette, sliced", "2 cups gruyere, shredded", "Fresh thyme"]
+    },
+    {
+      "id": "chicken-caesar-crispy-chickpeas",
+      "name": "Chicken Caesar Salad w/ Crispy Chickpeas",
+      "protein": "chicken",
+      "cookMinutes": 25,
+      "tags": ["favorite", "light"],
+      "ingredients": ["2 heads romaine, chopped", "1 can chickpeas, roasted crispy", "1 lb chicken breast, grilled", "1/2 cup parmesan", "Caesar dressing"]
+    },
+    {
+      "id": "air-fryer-sesame-chicken",
+      "name": "Air Fryer Sesame Chicken & Rice",
+      "protein": "chicken",
+      "cookMinutes": 30,
+      "tags": ["favorite", "air-fryer"],
+      "ingredients": ["1.5 lb chicken thighs, cubed", "3 tbsp soy sauce", "1 tbsp sesame oil", "2 tbsp honey", "Sesame seeds", "2 cups cooked rice"]
+    },
+    {
+      "id": "spaghetti-garlic-bread",
+      "name": "Spaghetti & Garlic Bread",
+      "protein": "beef",
+      "cookMinutes": 30,
+      "tags": ["favorite", "kid-friendly"],
+      "ingredients": ["1 lb spaghetti", "1 lb ground beef", "24 oz marinara sauce", "1 loaf garlic bread", "Parmesan"]
+    },
+    {
+      "id": "flank-steak-asparagus",
+      "name": "Flank Steak & Asparagus",
+      "protein": "beef",
+      "cookMinutes": 25,
+      "tags": ["favorite", "quick"],
+      "ingredients": ["1.5 lb flank steak", "1 bunch asparagus", "Olive oil", "Garlic powder"]
+    },
+    {
+      "id": "fajitas",
+      "name": "Fajitas",
+      "protein": "chicken",
+      "cookMinutes": 30,
+      "tags": ["favorite", "customizable"],
+      "ingredients": ["1.5 lb chicken breast or steak, sliced", "2 bell peppers, sliced", "1 onion, sliced", "8 tortillas", "2 avocados", "Fajita seasoning"]
+    },
+    {
+      "id": "beef-broccoli",
+      "name": "Beef & Broccoli",
+      "protein": "beef",
+      "cookMinutes": 25,
+      "tags": ["favorite", "quick"],
+      "ingredients": ["1.5 lb flank steak, sliced thin", "1 head broccoli, cut into florets", "1/3 cup soy sauce", "2 tbsp brown sugar", "1 tbsp cornstarch", "2 cups cooked rice"]
+    },
+    {
+      "id": "turkish-pasta",
+      "name": "Turkish Pasta",
+      "protein": "vegetarian",
+      "cookMinutes": 25,
+      "tags": ["favorite", "vegetarian"],
+      "ingredients": ["1 lb short pasta", "2 cups full-fat greek yogurt", "4 tbsp butter", "2 tbsp aleppo pepper or paprika", "4 cloves garlic"]
+    },
+    {
+      "id": "baked-salmon-veggies",
+      "name": "Baked Salmon & Roasted Veggies",
+      "protein": "fish",
+      "cookMinutes": 25,
+      "tags": ["fish", "weeknight", "add-more-variety"],
+      "ingredients": ["4 salmon fillets", "1 lb green beans or broccoli", "Olive oil", "Lemon", "Dill"]
+    },
+    {
+      "id": "shrimp-scampi",
+      "name": "Shrimp Scampi",
+      "protein": "fish",
+      "cookMinutes": 20,
+      "tags": ["fish", "quick", "add-more-variety"],
+      "ingredients": ["1 lb linguine", "1.5 lb shrimp, peeled", "5 cloves garlic, minced", "4 tbsp butter", "1/2 cup white wine", "Lemon", "Parsley"]
+    },
+    {
+      "id": "airfryer-tilapia-asparagus",
+      "name": "Air Fryer Tilapia & Asparagus",
+      "protein": "fish",
+      "cookMinutes": 20,
+      "tags": ["fish", "quick", "add-more-variety"],
+      "ingredients": ["4 tilapia fillets", "1 bunch asparagus", "Old Bay or lemon pepper seasoning", "Olive oil"]
+    }
+  ],
+  "girlLunches": [
+    {
+      "id": "rotisserie-chicken-plate",
+      "name": "Rotisserie Chicken & Veggie Plate",
+      "ingredients": ["Rotisserie chicken, sliced", "Babybel cheese", "Cucumber slices", "Carrots", "Pickles", "Fruit snacks"]
+    },
+    {
+      "id": "mason-jar-salad",
+      "name": "Mason Jar Salad (chickpea)",
+      "ingredients": ["1 can chickpeas", "Romaine, chopped", "Cucumber, diced", "Red onion, diced", "Feta", "Dressing on the side"]
+    },
+    {
+      "id": "chickpea-spinach-cottage-cheese",
+      "name": "Chickpea, Spinach & Cottage Cheese Bowl",
+      "ingredients": ["1 can chickpeas", "Baby spinach", "Cottage cheese", "Cherry tomatoes"]
+    },
+    {
+      "id": "chicken-sausage-veggie-medley",
+      "name": "Chicken Sausage & Veggie Medley",
+      "ingredients": ["Chicken sausage links, sliced", "Roasted sweet potatoes", "Green beans"]
+    },
+    {
+      "id": "turkey-cheese-crackers",
+      "name": "Turkey, Cheese & Crackers Plate",
+      "ingredients": ["Sliced turkey", "Sliced cheese", "Multigrain crackers", "Grapes", "Baby carrots"]
+    }
+  ],
+  "boyLunches": [
+    {
+      "id": "turkey-sandwich",
+      "name": "Turkey & Cheese Sandwich",
+      "ingredients": ["Sliced turkey", "Sliced cheese", "Sandwich bread", "Apple slices", "Pretzels"]
+    },
+    {
+      "id": "pbj-uncrustable-style",
+      "name": "PB&J",
+      "ingredients": ["Peanut butter", "Jelly", "Sandwich bread", "Baby carrots", "Fruit snacks"]
+    },
+    {
+      "id": "quesadilla-lunchbox",
+      "name": "Cheese Quesadilla + Sides",
+      "ingredients": ["Tortillas", "Shredded cheese", "Grapes", "Cucumber slices"]
+    },
+    {
+      "id": "pasta-salad-lunchbox",
+      "name": "Cold Pasta Salad",
+      "ingredients": ["Rotini pasta", "Cherry tomatoes", "Mozzarella pearls", "Italian dressing"]
+    },
+    {
+      "id": "chicken-nuggets-veggies",
+      "name": "Chicken Nuggets & Veggies",
+      "ingredients": ["Frozen chicken nuggets", "Baby carrots", "Ranch", "Applesauce cup"]
+    }
+  ]
+}
