@@ -102,6 +102,10 @@ export function parseStaples(input: unknown): StaplesData {
   };
 }
 
+export function parseRecipeId(value: unknown): string {
+  return requireString(value, "recipeId");
+}
+
 export function parseWeekPreferences(
   input: unknown,
   fallback: WeekPreferences

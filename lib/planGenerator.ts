@@ -345,6 +345,71 @@ export async function confirmCurrentPlan(): Promise<ResolvedWeekPlan> {
 }
 
 /**
+ * Explicit mutation: put a catalog recipe on this week's menu and lock it in.
+ * Dinners take the first unlocked slot; lunches replace the matching lunch pick.
+ * Creates this week's plan first when it doesn't exist yet.
+ */
+export async function addRecipeToCurrentWeek(
+  recipeId: string
+): Promise<ResolvedWeekPlan> {
+  const weekOf = weekStartISO();
+  let existing = await getWeekPlan(weekOf);
+  if (!existing) {
+    await ensureCurrentPlan();
+    existing = await getWeekPlan(weekOf);
+    if (!existing) {
+      throw new PlanNotFoundError(weekOf);
+    }
+  }
+
+  const catalog = await listCatalogRecipes();
+  const recipe = catalog.find((item) => item.id === recipeId);
+  if (!recipe || recipe.status === "archived") {
+    throw new Error(`Invalid recipeId: no active recipe with id ${recipeId}`);
+  }
+
+  if (recipe.kind === "girl_lunch" || recipe.kind === "boy_lunch") {
+    const field = recipe.kind === "girl_lunch" ? "girlLunch" : "boyLunch";
+    const plan = clearConfirmation({
+      ...existing,
+      [field]: recipe.id,
+      locks: { ...existing.locks, [field]: recipe.id },
+    });
+    await upsertWeekPlan(plan);
+    return resolvePlan(plan);
+  }
+
+  // Already on the menu: just lock its slot so regenerate keeps it.
+  const existingIndex = existing.dinners.findIndex(
+    (slot) => slot.type === "recipe" && slot.recipeId === recipe.id
+  );
+  const targetIndex =
+    existingIndex >= 0
+      ? existingIndex
+      : existing.locks.dinners.findIndex((lockId) => lockId === null);
+  if (targetIndex < 0) {
+    throw new Error(
+      "All dinner slots are locked — unlock one on the week page to add this recipe"
+    );
+  }
+
+  const dinners = existing.dinners.map((slot, i) =>
+    i === targetIndex ? ({ type: "recipe", recipeId: recipe.id } as DinnerSlot) : slot
+  );
+  const dinnerLocks = existing.locks.dinners.map((lockId, i) =>
+    i === targetIndex ? recipe.id : lockId
+  );
+
+  const plan = clearConfirmation({
+    ...existing,
+    dinners,
+    locks: { ...existing.locks, dinners: dinnerLocks },
+  });
+  await upsertWeekPlan(plan);
+  return resolvePlan(plan);
+}
+
+/**
  * Explicit mutation: type in an ad hoc dinner for a slot and lock it.
  * Customs are never written to the recipe catalog and never enter the avoid-set.
  */

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
+  addRecipeToCurrentWeek,
   ensureCurrentPlan,
   getCurrentPlan,
   PlanNotFoundError,
@@ -10,6 +11,7 @@ import { groceryListFor } from "@/lib/groceryListFor.server";
 import {
   parseCustomDinnerInput,
   parseLocks,
+  parseRecipeId,
   parseWeekPreferences,
 } from "@/lib/validation";
 import { getSettings } from "@/lib/dataStore";
@@ -20,7 +22,11 @@ function errorResponse(error: unknown, fallbackStatus = 500) {
   }
   const message = error instanceof Error ? error.message : "Unexpected error";
   const status =
-    error instanceof Error && /invalid/i.test(error.message) ? 400 : fallbackStatus;
+    error instanceof Error && /invalid/i.test(error.message)
+      ? 400
+      : error instanceof Error && /locked/i.test(error.message)
+        ? 409
+        : fallbackStatus;
   return NextResponse.json({ error: message }, { status });
 }
 
@@ -42,7 +48,15 @@ export async function POST(req: NextRequest) {
         ? "ensure"
         : body?.action === "setCustomDinner"
           ? "setCustomDinner"
-          : "regenerate";
+          : body?.action === "addRecipe"
+            ? "addRecipe"
+            : "regenerate";
+
+    if (action === "addRecipe") {
+      const plan = await addRecipeToCurrentWeek(parseRecipeId(body?.recipeId));
+      const groceryList = await groceryListFor(plan);
+      return NextResponse.json({ plan, groceryList });
+    }
 
     if (action === "setCustomDinner") {
       const plan = await setCustomDinnerForCurrentWeek(

@@ -15,6 +15,7 @@ export default function RecipesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | MealKind | "archived" | "favorites">("all");
+  const [addState, setAddState] = useState<Record<string, "adding" | "added">>({});
 
   useEffect(() => {
     let cancelled = false;
@@ -82,6 +83,33 @@ export default function RecipesPage() {
     setRecipes((prev) =>
       prev.map((item) => (item.id === recipe.id ? (json.recipe as CatalogRecipe) : item))
     );
+  }
+
+  async function addToThisWeek(recipe: CatalogRecipe) {
+    setError(null);
+    setAddState((prev) => ({ ...prev, [recipe.id]: "adding" }));
+    try {
+      const res = await fetch("/api/plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "addRecipe", recipeId: recipe.id }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Failed to add to this week");
+      setAddState((prev) => ({ ...prev, [recipe.id]: "added" }));
+      window.setTimeout(() => {
+        setAddState((prev) => {
+          const { [recipe.id]: _done, ...rest } = prev;
+          return rest;
+        });
+      }, 2500);
+    } catch (err) {
+      setAddState((prev) => {
+        const { [recipe.id]: _failed, ...rest } = prev;
+        return rest;
+      });
+      setError(err instanceof Error ? err.message : "Failed to add to this week");
+    }
   }
 
   const kindLabel = (kind: MealKind) => kind.replace("_", " ");
@@ -169,7 +197,27 @@ export default function RecipesPage() {
                     />
                   }
                 >
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                    {recipe.status !== "archived" && (
+                      <button
+                        type="button"
+                        onClick={() => addToThisWeek(recipe)}
+                        disabled={addState[recipe.id] === "adding"}
+                        className={cn(
+                          "rounded border px-2.5 py-1 text-xs font-semibold transition-colors duration-150",
+                          addState[recipe.id] === "added"
+                            ? "border-accent bg-accent text-accent-foreground"
+                            : "border-border text-foreground hover:border-accent hover:text-accent-text",
+                          addState[recipe.id] === "adding" && "opacity-60"
+                        )}
+                      >
+                        {addState[recipe.id] === "adding"
+                          ? "Adding…"
+                          : addState[recipe.id] === "added"
+                            ? "On this week's menu"
+                            : "Add to this week"}
+                      </button>
+                    )}
                     <Link
                       href={`/recipes/${recipe.id}`}
                       className="text-sm font-semibold text-foreground underline-offset-2 hover:underline"
