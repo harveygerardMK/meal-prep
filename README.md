@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Weekly Meal Prep
 
-## Getting Started
+A private, single-household weekly meal planner: dinners, kid lunches, and a grocery list.
 
-First, run the development server:
+## Deployment model
+
+**Chosen model: local / single-household self-hosted.**
+
+- Plans, settings, and history are stored as JSON files under [`data/`](data/).
+- Run with `npm run dev` or `npm run build && npm run start` on a machine with a durable writable disk.
+- Do **not** deploy to Vercel (or other serverless hosts) without replacing the filesystem store — writes to `data/` do not persist there.
+- There is no authentication; treat this as a local/private tool on a trusted network.
+
+Hosted multi-device use would require durable storage and auth first. That is out of scope while this local model is in effect.
+
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `/` — this week’s plan, lock meals, regenerate, grocery list
+- `/settings` — dinners per week, max cook time, no-repeat window, servings
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
 
-## Learn More
+| Script | Purpose |
+|--------|---------|
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm run start` | Run production server |
+| `npm run lint` | ESLint |
+| `npm test` | Unit tests |
 
-To learn more about Next.js, take a look at the following resources:
+## Data files
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| File | Role |
+|------|------|
+| `data/recipes.json` | Dinner and lunch catalog (edit by hand) |
+| `data/settings.json` | Planning constraints |
+| `data/history.json` | Past and current week plans |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Stack
 
-## Deploy on Vercel
+Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Workflow priorities (current)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Shipped for daily use with the local model:
+
+- Persistent grocery checkoffs (this device, per week)
+- Clear load/save/regenerate error and success feedback
+- Request validation and unit tests for planning helpers
+
+Still later (not blocking local use): quantity scaling, in-app recipe editing, protein/tag filters.

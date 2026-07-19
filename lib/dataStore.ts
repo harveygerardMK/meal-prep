@@ -2,8 +2,8 @@ import fs from "fs/promises";
 import path from "path";
 import type { RecipeData, Settings, History } from "./types";
 
-// Writes to local disk only persist for `next dev`/self-hosted deploys, not on
-// Vercel's serverless filesystem — swap to Vercel Blob/a DB before deploying there.
+// Local single-household self-hosted model: JSON on disk. Not durable on
+// Vercel serverless — keep this private/local until a DB/Blob backend exists.
 const DATA_DIR = path.join(process.cwd(), "data");
 
 async function readJson<T>(file: string): Promise<T> {

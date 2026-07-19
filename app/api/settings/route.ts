@@ -1,14 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSettings, saveSettings } from "@/lib/dataStore";
-import type { Settings } from "@/lib/types";
+import { parseSettings } from "@/lib/validation";
+
+function errorResponse(error: unknown, fallbackStatus = 500) {
+  const message = error instanceof Error ? error.message : "Unexpected error";
+  const status =
+    error instanceof Error && /invalid/i.test(error.message) ? 400 : fallbackStatus;
+  return NextResponse.json({ error: message }, { status });
+}
 
 export async function GET() {
-  const settings = await getSettings();
-  return NextResponse.json(settings);
+  try {
+    const settings = await getSettings();
+    return NextResponse.json(settings);
+  } catch (error) {
+    return errorResponse(error);
+  }
 }
 
 export async function PUT(req: NextRequest) {
-  const settings = (await req.json()) as Settings;
-  await saveSettings(settings);
-  return NextResponse.json(settings);
+  try {
+    const body = await req.json();
+    const settings = parseSettings(body);
+    await saveSettings(settings);
+    return NextResponse.json(settings);
+  } catch (error) {
+    return errorResponse(error);
+  }
 }

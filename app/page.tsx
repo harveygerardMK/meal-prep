@@ -16,37 +16,76 @@ export default function Home() {
   const [lockedGirl, setLockedGirl] = useState(false);
   const [lockedBoy, setLockedBoy] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/plan")
-      .then((r) => r.json())
-      .then((res: PlanResponse) => {
-        setData(res);
-        setLockedDinners(res.plan.locks.dinners.map((id) => id !== null));
-        setLockedGirl(res.plan.locks.girlLunch !== null);
-        setLockedBoy(res.plan.locks.boyLunch !== null);
-      });
+    let cancelled = false;
+    async function load() {
+      setError(null);
+      try {
+        const res = await fetch("/api/plan");
+        const json = await res.json();
+        if (!res.ok) {
+          throw new Error(json.error || "Failed to load this week's plan");
+        }
+        if (cancelled) return;
+        setData(json as PlanResponse);
+        setLockedDinners(json.plan.locks.dinners.map((id: string | null) => id !== null));
+        setLockedGirl(json.plan.locks.girlLunch !== null);
+        setLockedBoy(json.plan.locks.boyLunch !== null);
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "Failed to load this week's plan");
+        }
+      }
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   async function regenerate() {
     if (!data) return;
     setBusy(true);
-    const locks: Locks = {
-      dinners: data.plan.dinners.map((d, i) => (lockedDinners[i] ? d.id : null)),
-      girlLunch: lockedGirl ? data.plan.girlLunch.id : null,
-      boyLunch: lockedBoy ? data.plan.boyLunch.id : null,
-    };
-    const res = await fetch("/api/plan", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ locks }),
-    });
-    const json: PlanResponse = await res.json();
-    setData(json);
-    setLockedDinners(json.plan.locks.dinners.map((id) => id !== null));
-    setLockedGirl(json.plan.locks.girlLunch !== null);
-    setLockedBoy(json.plan.locks.boyLunch !== null);
-    setBusy(false);
+    setError(null);
+    setStatus(null);
+    try {
+      const locks: Locks = {
+        dinners: data.plan.dinners.map((d, i) => (lockedDinners[i] ? d.id : null)),
+        girlLunch: lockedGirl ? data.plan.girlLunch.id : null,
+        boyLunch: lockedBoy ? data.plan.boyLunch.id : null,
+      };
+      const res = await fetch("/api/plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ locks }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error || "Failed to regenerate plan");
+      }
+      setData(json as PlanResponse);
+      setLockedDinners(json.plan.locks.dinners.map((id: string | null) => id !== null));
+      setLockedGirl(json.plan.locks.girlLunch !== null);
+      setLockedBoy(json.plan.locks.boyLunch !== null);
+      setStatus("Plan updated — unlocked meals were reshuffled.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to regenerate plan");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (error && !data) {
+    return (
+      <main className="mx-auto max-w-3xl px-6 py-16 text-center">
+        <p className="text-red-600 dark:text-red-400" role="alert">
+          {error}
+        </p>
+      </main>
+    );
   }
 
   if (!data) {
@@ -74,14 +113,27 @@ export default function Home() {
             Settings
           </Link>
           <button
+            type="button"
             onClick={regenerate}
             disabled={busy}
+            aria-busy={busy}
             className="rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background disabled:opacity-50"
           >
             {busy ? "Shuffling…" : "Regenerate"}
           </button>
         </div>
       </div>
+
+      {error && (
+        <p className="mb-4 text-sm text-red-600 dark:text-red-400" role="alert">
+          {error}
+        </p>
+      )}
+      {status && (
+        <p className="mb-4 text-sm text-emerald-700 dark:text-emerald-400" aria-live="polite">
+          {status}
+        </p>
+      )}
 
       <section className="mb-8">
         <h2 className="mb-3 text-lg font-semibold">Dinners</h2>
@@ -123,7 +175,14 @@ export default function Home() {
 
       <section>
         <h2 className="mb-3 text-lg font-semibold">Grocery List</h2>
-        <GroceryListView sections={data.groceryList} />
+        <p className="mb-3 text-xs text-zinc-500 dark:text-zinc-400">
+          Checkoffs stay on this device for the current week.
+        </p>
+        <GroceryListView
+          key={data.plan.weekOf}
+          sections={data.groceryList}
+          weekOf={data.plan.weekOf}
+        />
       </section>
     </main>
   );

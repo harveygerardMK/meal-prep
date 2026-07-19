@@ -7,22 +7,65 @@ import type { Settings } from "@/lib/types";
 export default function SettingsPage() {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [saved, setSaved] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/settings")
-      .then((r) => r.json())
-      .then(setSettings);
+    let cancelled = false;
+    async function load() {
+      setError(null);
+      try {
+        const res = await fetch("/api/settings");
+        const json = await res.json();
+        if (!res.ok) {
+          throw new Error(json.error || "Failed to load settings");
+        }
+        if (!cancelled) setSettings(json as Settings);
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "Failed to load settings");
+        }
+      }
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   async function save() {
     if (!settings) return;
-    await fetch("/api/settings", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(settings),
-    });
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    setBusy(true);
+    setError(null);
+    setSaved(false);
+    try {
+      const res = await fetch("/api/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(settings),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error || "Failed to save settings");
+      }
+      setSettings(json as Settings);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save settings");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (error && !settings) {
+    return (
+      <main className="mx-auto max-w-lg px-6 py-16 text-center">
+        <p className="text-red-600 dark:text-red-400" role="alert">
+          {error}
+        </p>
+      </main>
+    );
   }
 
   if (!settings) {
@@ -68,30 +111,51 @@ export default function SettingsPage() {
         </Link>
       </div>
 
+      {error && (
+        <p className="mb-4 text-sm text-red-600 dark:text-red-400" role="alert">
+          {error}
+        </p>
+      )}
+
       <div className="space-y-5">
-        {fields.map((field) => (
-          <div key={field.key}>
-            <label className="mb-1 block text-sm font-medium">{field.label}</label>
-            <input
-              type="number"
-              min={1}
-              value={settings[field.key]}
-              onChange={(e) =>
-                setSettings({ ...settings, [field.key]: Number(e.target.value) })
-              }
-              className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
-            />
-            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{field.hint}</p>
-          </div>
-        ))}
+        {fields.map((field) => {
+          const inputId = `setting-${field.key}`;
+          return (
+            <div key={field.key}>
+              <label htmlFor={inputId} className="mb-1 block text-sm font-medium">
+                {field.label}
+              </label>
+              <input
+                id={inputId}
+                type="number"
+                min={1}
+                value={settings[field.key]}
+                onChange={(e) =>
+                  setSettings({ ...settings, [field.key]: Number(e.target.value) })
+                }
+                className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
+              />
+              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{field.hint}</p>
+            </div>
+          );
+        })}
       </div>
 
       <button
+        type="button"
         onClick={save}
-        className="mt-8 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background"
+        disabled={busy}
+        aria-busy={busy}
+        className="mt-8 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background disabled:opacity-50"
       >
-        {saved ? "Saved!" : "Save settings"}
+        {busy ? "Saving…" : saved ? "Saved!" : "Save settings"}
       </button>
+      {saved && (
+        <p className="mt-2 text-sm text-emerald-700 dark:text-emerald-400" aria-live="polite">
+          Settings saved. Regenerate the plan on the home page to apply dinner-count or cook-time
+          changes to this week.
+        </p>
+      )}
     </main>
   );
 }
