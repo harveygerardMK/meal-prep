@@ -26,6 +26,7 @@ const planFixture = (): ResolvedWeekPlan => ({
   locks: { dinners: [null], girlLunch: null, boyLunch: null },
   preferences: { cookEffortTarget: 3, noveltyTarget: 3 },
   miscGrocery: [],
+  confirmed: false,
 });
 
 describe("groceryListFor", () => {

@@ -28,6 +28,28 @@ export class PlanNotFoundError extends Error {
   }
 }
 
+export function withConfirmationDefaults(
+  plan: WeekPlan
+): WeekPlan & { confirmed: boolean } {
+  return plan.confirmed ? { ...plan, confirmed: true } : clearConfirmation(plan);
+}
+
+export function markPlanConfirmed(plan: WeekPlan, confirmedAt: string): WeekPlan {
+  return {
+    ...plan,
+    confirmed: true,
+    confirmedAt,
+  };
+}
+
+export function clearConfirmation(plan: WeekPlan): WeekPlan & { confirmed: false } {
+  const { confirmedAt: _confirmedAt, ...unconfirmedPlan } = plan;
+  return {
+    ...unconfirmedPlan,
+    confirmed: false,
+  };
+}
+
 function recentWeeks(history: History, beforeWeekOf: string, count: number): WeekPlan[] {
   return history.weeks
     .filter((w) => w.weekOf < beforeWeekOf)
@@ -103,7 +125,7 @@ async function buildPlan(
   const girlLunch = pickLunch(recipes.girlLunches, avoidGirl, locks.girlLunch);
   const boyLunch = pickLunch(recipes.boyLunches, avoidBoy, locks.boyLunch);
 
-  const plan: WeekPlan = {
+  const plan = clearConfirmation({
     weekOf,
     dinners,
     girlLunch,
@@ -112,7 +134,7 @@ async function buildPlan(
     preferences,
     // Keep household extras across regenerate / rebuild.
     miscGrocery: existingWeek?.miscGrocery ?? [],
-  };
+  });
   await upsertWeekPlan(plan);
   const consumed = queued
     .filter((item) => dinners.includes(item.recipeId))
@@ -122,6 +144,7 @@ async function buildPlan(
 }
 
 async function resolvePlan(plan: WeekPlan): Promise<ResolvedWeekPlan> {
+  const normalizedPlan = withConfirmationDefaults(plan);
   // Include archived recipes so historical plans still resolve after archive.
   const catalog = await listCatalogRecipes();
   const settings = await getSettings();
@@ -132,7 +155,7 @@ async function resolvePlan(plan: WeekPlan): Promise<ResolvedWeekPlan> {
   const girlById = new Map(recipes.girlLunches.map((l) => [l.id, l]));
   const boyById = new Map(recipes.boyLunches.map((l) => [l.id, l]));
 
-  const dinners = plan.dinners.map((id) => {
+  const dinners = normalizedPlan.dinners.map((id) => {
     const dinner = dinnerById.get(id);
     if (!dinner) {
       throw new Error(`Unknown dinner id in plan: ${id}`);
@@ -140,26 +163,30 @@ async function resolvePlan(plan: WeekPlan): Promise<ResolvedWeekPlan> {
     return dinner;
   });
 
-  const girlLunch = girlById.get(plan.girlLunch);
+  const girlLunch = girlById.get(normalizedPlan.girlLunch);
   if (!girlLunch) {
     throw new Error(`Unknown girl lunch id in plan: ${plan.girlLunch}`);
   }
-  const boyLunch = boyById.get(plan.boyLunch);
+  const boyLunch = boyById.get(normalizedPlan.boyLunch);
   if (!boyLunch) {
     throw new Error(`Unknown boy lunch id in plan: ${plan.boyLunch}`);
   }
 
   return {
-    weekOf: plan.weekOf,
+    weekOf: normalizedPlan.weekOf,
     dinners,
     girlLunch,
     boyLunch,
-    locks: plan.locks,
-    preferences: plan.preferences ?? {
+    locks: normalizedPlan.locks,
+    preferences: normalizedPlan.preferences ?? {
       cookEffortTarget: settings.cookEffortTarget,
       noveltyTarget: settings.noveltyTarget,
     },
-    miscGrocery: plan.miscGrocery ?? [],
+    miscGrocery: normalizedPlan.miscGrocery ?? [],
+    confirmed: normalizedPlan.confirmed,
+    ...(normalizedPlan.confirmedAt
+      ? { confirmedAt: normalizedPlan.confirmedAt }
+      : {}),
   };
 }
 
@@ -209,4 +236,16 @@ export async function regenerateCurrentPlan(
     avoidCurrentUnlocked: true,
   });
   return resolvePlan(plan);
+}
+
+/** Explicit mutation: mark this week's plan as reviewed and finalized. */
+export async function confirmCurrentPlan(): Promise<ResolvedWeekPlan> {
+  const weekOf = weekStartISO();
+  const existing = await getWeekPlan(weekOf);
+  if (!existing) {
+    throw new PlanNotFoundError(weekOf);
+  }
+  const confirmed = markPlanConfirmed(existing, new Date().toISOString());
+  await upsertWeekPlan(confirmed);
+  return resolvePlan(confirmed);
 }

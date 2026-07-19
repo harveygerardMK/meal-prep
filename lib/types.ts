@@ -120,6 +120,8 @@ export type WeekPlan = {
   locks: Locks;
   preferences?: WeekPreferences;
   miscGrocery?: MiscGroceryItem[];
+  confirmed?: boolean;
+  confirmedAt?: string;
 };
 
 export type History = {
@@ -134,4 +136,6 @@ export type ResolvedWeekPlan = {
   locks: Locks;
   preferences: WeekPreferences;
   miscGrocery: MiscGroceryItem[];
+  confirmed: boolean;
+  confirmedAt?: string;
 };

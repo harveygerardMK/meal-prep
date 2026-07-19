@@ -144,6 +144,25 @@ export default function Home() {
     }
   }
 
+  async function confirmPlan() {
+    setBusy(true);
+    setError(null);
+    setStatus(null);
+    try {
+      const res = await fetch("/api/plan/confirm", { method: "POST" });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error || "Failed to confirm this week's plan");
+      }
+      setData(json as PlanResponse);
+      setStatus("Plan confirmed for this week.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to confirm this week's plan");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   if (error && !data) {
     return (
       <main className="mx-auto max-w-6xl px-6 py-16 text-center">
@@ -177,15 +196,40 @@ export default function Home() {
           </h1>
           <p className="mt-2 text-sm text-muted">Week of {data.plan.weekOf}</p>
         </div>
-        <Button
-          type="button"
-          onClick={() => setConfirmRegen(true)}
-          disabled={busy}
-          aria-busy={busy}
-        >
-          {busy ? "Shuffling…" : "Regenerate"}
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <span
+            className={
+              data.plan.confirmed
+                ? "rounded-full bg-success/15 px-3 py-1 text-xs font-semibold text-success"
+                : "rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold text-muted"
+            }
+          >
+            {data.plan.confirmed ? "Confirmed" : "Not confirmed"}
+          </span>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={confirmPlan}
+            disabled={busy || data.plan.confirmed}
+            aria-busy={busy}
+          >
+            {data.plan.confirmed ? "Plan confirmed" : busy ? "Confirming…" : "Confirm this week"}
+          </Button>
+          <Button
+            type="button"
+            onClick={() => setConfirmRegen(true)}
+            disabled={busy}
+            aria-busy={busy}
+          >
+            {busy ? "Shuffling…" : "Regenerate"}
+          </Button>
+        </div>
       </div>
+      {data.plan.confirmedAt && (
+        <p className="mb-6 text-xs text-meta">
+          Confirmed {new Date(data.plan.confirmedAt).toLocaleString()}
+        </p>
+      )}
 
       {error && (
         <p className="mb-4 text-sm text-accent" role="alert">
