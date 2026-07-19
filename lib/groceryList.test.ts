@@ -26,6 +26,8 @@ function planFixture(overrides: Partial<ResolvedWeekPlan> = {}): ResolvedWeekPla
       ingredients: ["Peanut butter", "Sandwich bread"],
     },
     locks: { dinners: [null], girlLunch: null, boyLunch: null },
+    preferences: { cookEffortTarget: 3, noveltyTarget: 3 },
+    miscGrocery: [],
     ...overrides,
   };
 }
@@ -75,5 +77,25 @@ describe("buildGroceryList", () => {
     const allEntries = sections.flatMap((s) => s.items.flatMap((i) => i.entries));
     expect(allEntries.some((e) => e.source.includes("Girl lunch ×5"))).toBe(true);
     expect(allEntries.some((e) => e.source.includes("Boy lunch ×5"))).toBe(true);
+  });
+
+  it("appends household miscellaneous items in their own section", () => {
+    const sections = buildGroceryList(
+      planFixture({
+        miscGrocery: [
+          {
+            id: "misc-1",
+            name: "Paper towels",
+            note: "Bounty mega",
+            addedAt: "2026-07-15T12:00:00.000Z",
+          },
+        ],
+      })
+    );
+    const misc = sections.find((s) => s.section === "Miscellaneous");
+    expect(misc?.items).toHaveLength(1);
+    expect(misc?.items[0]?.name).toBe("Paper towels");
+    expect(misc?.items[0]?.miscId).toBe("misc-1");
+    expect(misc?.items[0]?.checkKey).toBe("misc:misc-1");
   });
 });

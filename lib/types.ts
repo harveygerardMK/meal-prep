@@ -84,6 +84,14 @@ export type Locks = {
   boyLunch: string | null;
 };
 
+/** Household add-ons for the week (paper towels, snacks, etc.). */
+export type MiscGroceryItem = {
+  id: string;
+  name: string;
+  note?: string;
+  addedAt: string;
+};
+
 export type WeekPlan = {
   weekOf: string;
   dinners: string[];
@@ -91,6 +99,7 @@ export type WeekPlan = {
   boyLunch: string;
   locks: Locks;
   preferences?: WeekPreferences;
+  miscGrocery?: MiscGroceryItem[];
 };
 
 export type History = {
@@ -104,4 +113,5 @@ export type ResolvedWeekPlan = {
   boyLunch: LunchOption;
   locks: Locks;
   preferences: WeekPreferences;
+  miscGrocery: MiscGroceryItem[];
 };

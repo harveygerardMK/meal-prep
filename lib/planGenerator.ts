@@ -92,6 +92,7 @@ async function buildPlan(
   const girlLunch = pickLunch(recipes.girlLunches, avoidGirl, locks.girlLunch);
   const boyLunch = pickLunch(recipes.boyLunches, avoidBoy, locks.boyLunch);
 
+  const existingWeek = history.weeks.find((w) => w.weekOf === weekOf);
   const plan: WeekPlan = {
     weekOf,
     dinners,
@@ -99,6 +100,8 @@ async function buildPlan(
     boyLunch,
     locks,
     preferences,
+    // Keep household extras across regenerate / rebuild.
+    miscGrocery: existingWeek?.miscGrocery ?? [],
   };
   await upsertWeekPlan(plan);
   const consumed = queued
@@ -146,6 +149,7 @@ async function resolvePlan(plan: WeekPlan): Promise<ResolvedWeekPlan> {
       cookEffortTarget: settings.cookEffortTarget,
       noveltyTarget: settings.noveltyTarget,
     },
+    miscGrocery: plan.miscGrocery ?? [],
   };
 }
 

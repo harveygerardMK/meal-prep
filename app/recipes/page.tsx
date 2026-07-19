@@ -7,7 +7,9 @@ import type { CatalogRecipe, MealKind } from "@/lib/types";
 export default function RecipesPage() {
   const [recipes, setRecipes] = useState<CatalogRecipe[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | MealKind | "archived" | "favorites">("all");
+  const [pendingArchive, setPendingArchive] = useState<CatalogRecipe | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -57,6 +59,7 @@ export default function RecipesPage() {
 
   async function archive(recipe: CatalogRecipe) {
     setError(null);
+    setStatus(null);
     const res = await fetch(`/api/recipes/${recipe.id}`, { method: "DELETE" });
     const json = await res.json();
     if (!res.ok) {
@@ -66,32 +69,57 @@ export default function RecipesPage() {
     setRecipes((prev) =>
       prev.map((item) => (item.id === recipe.id ? (json.recipe as CatalogRecipe) : item))
     );
+    setPendingArchive(null);
+    setStatus(`Archived “${recipe.name}”.`);
   }
 
   return (
     <main className="mx-auto w-full max-w-3xl px-6 py-10">
       <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Recipe catalog</h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          <h1 className="text-2xl font-bold">Recipes</h1>
+          <p className="text-sm text-zinc-600 dark:text-zinc-300">
             Add, edit, favorite, and archive household recipes.
           </p>
         </div>
-        <div className="flex gap-2">
-          <Link
-            href="/"
-            className="rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900"
-          >
-            Plan
-          </Link>
-          <Link
-            href="/recipes/new"
-            className="rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background"
-          >
-            Add recipe
-          </Link>
-        </div>
+        <Link
+          href="/recipes/new"
+          className="inline-flex min-h-11 items-center rounded-lg bg-foreground px-4 text-sm font-medium text-background"
+        >
+          Add recipe
+        </Link>
       </div>
+
+      {pendingArchive && (
+        <div
+          className="mb-6 rounded-xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-900"
+          role="alertdialog"
+          aria-labelledby="archive-title"
+        >
+          <h2 id="archive-title" className="text-base font-semibold">
+            Archive {pendingArchive.name}?
+          </h2>
+          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
+            It leaves the active catalog but stays recoverable under Archived.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => archive(pendingArchive)}
+              className="min-h-11 rounded-lg bg-foreground px-4 text-sm font-medium text-background"
+            >
+              Archive recipe
+            </button>
+            <button
+              type="button"
+              onClick={() => setPendingArchive(null)}
+              className="min-h-11 rounded-lg border border-zinc-200 px-4 text-sm font-medium dark:border-zinc-700"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="mb-6 flex flex-wrap gap-2">
         {(
@@ -108,10 +136,10 @@ export default function RecipesPage() {
             key={value}
             type="button"
             onClick={() => setFilter(value)}
-            className={`rounded-full px-3 py-1 text-xs font-medium ${
+            className={`min-h-11 rounded-lg px-3 text-sm font-medium ${
               filter === value
                 ? "bg-foreground text-background"
-                : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
+                : "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
             }`}
           >
             {label}
@@ -124,6 +152,11 @@ export default function RecipesPage() {
           {error}
         </p>
       )}
+      {status && (
+        <p className="mb-4 text-sm text-emerald-700 dark:text-emerald-400" aria-live="polite">
+          {status}
+        </p>
+      )}
 
       <ul className="space-y-3">
         {visible.map((recipe) => (
@@ -133,13 +166,13 @@ export default function RecipesPage() {
           >
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <p className="text-xs uppercase tracking-wide text-zinc-400">
+                <p className="text-sm text-zinc-600 dark:text-zinc-300">
                   {recipe.kind.replace("_", " ")}
                   {recipe.status === "archived" ? " · archived" : ""}
                   {recipe.favorite ? " · favorite" : ""}
                 </p>
                 <h2 className="text-lg font-semibold">{recipe.name}</h2>
-                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
                   {recipe.kind === "dinner"
                     ? `${recipe.cookMinutes ?? "?"} min · ${recipe.protein ?? "protein n/a"}`
                     : `${recipe.ingredients.length} ingredients`}
@@ -149,21 +182,21 @@ export default function RecipesPage() {
                 <button
                   type="button"
                   onClick={() => toggleFavorite(recipe)}
-                  className="rounded-full border border-zinc-200 px-3 py-1 text-xs font-medium dark:border-zinc-700"
+                  className="inline-flex min-h-11 items-center rounded-lg border border-zinc-200 px-3 text-sm font-medium dark:border-zinc-700"
                 >
                   {recipe.favorite ? "Unfavorite" : "Favorite"}
                 </button>
                 <Link
                   href={`/recipes/${recipe.id}`}
-                  className="rounded-full border border-zinc-200 px-3 py-1 text-xs font-medium dark:border-zinc-700"
+                  className="inline-flex min-h-11 items-center rounded-lg border border-zinc-200 px-3 text-sm font-medium dark:border-zinc-700"
                 >
                   Edit
                 </Link>
                 {recipe.status !== "archived" && (
                   <button
                     type="button"
-                    onClick={() => archive(recipe)}
-                    className="rounded-full border border-zinc-200 px-3 py-1 text-xs font-medium dark:border-zinc-700"
+                    onClick={() => setPendingArchive(recipe)}
+                    className="inline-flex min-h-11 items-center rounded-lg border border-zinc-200 px-3 text-sm font-medium dark:border-zinc-700"
                   >
                     Archive
                   </button>
@@ -175,7 +208,13 @@ export default function RecipesPage() {
       </ul>
 
       {visible.length === 0 && (
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">No recipes in this filter.</p>
+        <p className="text-sm text-zinc-600 dark:text-zinc-300">
+          No recipes here yet.{" "}
+          <Link href="/recipes/new" className="font-medium underline-offset-2 hover:underline">
+            Add a recipe
+          </Link>{" "}
+          or import from TikTok under More.
+        </p>
       )}
     </main>
   );

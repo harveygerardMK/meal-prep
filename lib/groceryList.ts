@@ -1,8 +1,17 @@
 import type { ResolvedWeekPlan } from "./types";
 
 export type GroceryEntry = { text: string; source: string };
-export type GroceryItem = { name: string; entries: GroceryEntry[] };
+export type GroceryItem = {
+  name: string;
+  entries: GroceryEntry[];
+  /** Stable checkoff / remove key; defaults to name when omitted. */
+  checkKey?: string;
+  /** Present when this row is a household misc add-on. */
+  miscId?: string;
+};
 export type GrocerySection = { section: string; items: GroceryItem[] };
+
+export const MISC_SECTION = "Miscellaneous";
 
 const SECTION_ORDER = [
   "Produce",
@@ -12,6 +21,7 @@ const SECTION_ORDER = [
   "Frozen",
   "Pantry & Dry Goods",
   "Other",
+  MISC_SECTION,
 ] as const;
 
 const SECTION_KEYWORDS: [string, RegExp][] = [
@@ -84,6 +94,21 @@ export function buildGroceryList(plan: ResolvedWeekPlan): GrocerySection[] {
   }
   for (const items of bySection.values()) {
     items.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  if (plan.miscGrocery.length > 0) {
+    const miscItems: GroceryItem[] = plan.miscGrocery.map((item) => ({
+      name: item.name,
+      checkKey: `misc:${item.id}`,
+      miscId: item.id,
+      entries: [
+        {
+          text: item.note?.trim() ? item.note.trim() : item.name,
+          source: "Added this week",
+        },
+      ],
+    }));
+    bySection.set(MISC_SECTION, miscItems);
   }
 
   return SECTION_ORDER.filter((s) => bySection.has(s)).map((section) => ({

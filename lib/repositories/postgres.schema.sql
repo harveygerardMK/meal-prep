@@ -31,6 +31,7 @@ create table if not exists week_plans (
   boy_lunch text not null,
   locks jsonb not null,
   preferences jsonb,
+  misc_grocery jsonb not null default '[]'::jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

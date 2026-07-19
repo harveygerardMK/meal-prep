@@ -44,19 +44,12 @@ export default function ImportPage() {
 
   return (
     <main className="mx-auto w-full max-w-lg px-6 py-10">
-      <div className="mb-8 flex items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold">Import from TikTok</h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Paste a link, then add the caption/notes if needed. You always review before it joins next week.
-          </p>
-        </div>
-        <Link
-          href="/recipes"
-          className="rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium dark:border-zinc-800"
-        >
-          Catalog
-        </Link>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-wrap-balance">Import from TikTok</h1>
+        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+          Paste a link, then add the caption/notes if needed. You always review before it joins next
+          week.
+        </p>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-4">
