@@ -78,6 +78,20 @@ describe("pickDinners", () => {
     );
     expect(result[0]).toBe("pork-a");
   });
+
+  it("fills empty slots with priority queue ids first", () => {
+    const result = pickDinners(
+      dinners,
+      2,
+      40,
+      new Set(),
+      [null, null],
+      { cookEffortTarget: 3, noveltyTarget: 3 },
+      ["pork-a"]
+    );
+    expect(result[0]).toBe("pork-a");
+    expect(result[1]).toBeTruthy();
+  });
 });
 
 describe("pickLunch", () => {

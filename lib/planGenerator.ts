@@ -9,6 +9,10 @@ import {
 import { weekStartISO } from "./week";
 import { pickDinners, pickLunch } from "./planSelection";
 import { recipeToPlannerViews } from "./recipes/recipeValidation";
+import {
+  listPendingForWeek,
+  markQueueConsumed,
+} from "./repositories/queueRepository";
 import type {
   Locks,
   WeekPlan,
@@ -75,13 +79,15 @@ async function buildPlan(
   const avoidGirl = recentLunchIds(history, weekOf, settings.noRepeatWeeks, "girlLunch");
   const avoidBoy = recentLunchIds(history, weekOf, settings.noRepeatWeeks, "boyLunch");
 
+  const queued = await listPendingForWeek(weekOf);
   const dinners = pickDinners(
     recipes.dinners,
     settings.dinnersPerWeek,
     settings.maxCookMinutes,
     avoidDinners,
     locks.dinners,
-    preferences
+    preferences,
+    queued.map((item) => item.recipeId)
   );
   const girlLunch = pickLunch(recipes.girlLunches, avoidGirl, locks.girlLunch);
   const boyLunch = pickLunch(recipes.boyLunches, avoidBoy, locks.boyLunch);
@@ -95,6 +101,10 @@ async function buildPlan(
     preferences,
   };
   await upsertWeekPlan(plan);
+  const consumed = queued
+    .filter((item) => dinners.includes(item.recipeId))
+    .map((item) => item.id);
+  await markQueueConsumed(consumed);
   return plan;
 }
 

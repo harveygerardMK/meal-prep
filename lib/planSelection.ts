@@ -30,7 +30,8 @@ export function pickDinners(
   maxCookMinutes: number,
   avoidIds: Set<string>,
   locked: (string | null)[],
-  preferences: WeekPreferences = { cookEffortTarget: 3, noveltyTarget: 3 }
+  preferences: WeekPreferences = { cookEffortTarget: 3, noveltyTarget: 3 },
+  priorityIds: string[] = []
 ): string[] {
   const result: string[] = locked.slice(0, count).map((id) => id ?? "");
   while (result.length < count) result.push("");
@@ -44,6 +45,20 @@ export function pickDinners(
       usedProteins.add(d.protein);
       usedIds.add(d.id);
     }
+  }
+
+  // Fill empty slots with queued/priority recipes first (still respecting cook time).
+  for (const priorityId of priorityIds) {
+    const emptyIndex = result.findIndex((id) => !id);
+    if (emptyIndex < 0) break;
+    if (usedIds.has(priorityId)) continue;
+    const dinner = allDinners.find(
+      (item) => item.id === priorityId && item.cookMinutes <= maxCookMinutes
+    );
+    if (!dinner) continue;
+    result[emptyIndex] = dinner.id;
+    usedIds.add(dinner.id);
+    usedProteins.add(dinner.protein);
   }
 
   const withinTime = allDinners.filter((d) => d.cookMinutes <= maxCookMinutes);
