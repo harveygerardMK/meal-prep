@@ -4,9 +4,11 @@ import {
   getHistory,
   upsertWeekPlan,
   getWeekPlan,
+  listCatalogRecipes,
 } from "./dataStore";
 import { weekStartISO } from "./week";
 import { pickDinners, pickLunch } from "./planSelection";
+import { recipeToPlannerViews } from "./recipes/recipeValidation";
 import type {
   Locks,
   WeekPlan,
@@ -84,7 +86,12 @@ async function buildPlan(weekOf: string, locks: Locks): Promise<WeekPlan> {
 }
 
 async function resolvePlan(plan: WeekPlan): Promise<ResolvedWeekPlan> {
-  const recipes = await getRecipes();
+  // Include archived recipes so historical plans still resolve after archive.
+  const catalog = await listCatalogRecipes();
+  const settings = await getSettings();
+  const recipes = recipeToPlannerViews(catalog, settings.servings, {
+    includeArchived: true,
+  });
   const dinnerById = new Map(recipes.dinners.map((d) => [d.id, d]));
   const girlById = new Map(recipes.girlLunches.map((l) => [l.id, l]));
   const boyById = new Map(recipes.boyLunches.map((l) => [l.id, l]));

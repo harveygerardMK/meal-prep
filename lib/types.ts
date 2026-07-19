@@ -1,3 +1,27 @@
+export type RecipeStatus = "draft" | "active" | "archived";
+export type MealKind = "dinner" | "girl_lunch" | "boy_lunch";
+
+export type RecipeSource = {
+  type: "manual" | "tiktok" | "other";
+  url?: string;
+};
+
+export type CatalogRecipe = {
+  id: string;
+  kind: MealKind;
+  name: string;
+  protein?: string;
+  cookMinutes?: number;
+  tags: string[];
+  ingredients: string[];
+  instructions: string[];
+  status: RecipeStatus;
+  favorite: boolean;
+  effortScore: number;
+  noveltyScore: number;
+  source?: RecipeSource;
+};
+
 export type Dinner = {
   id: string;
   name: string;
@@ -5,19 +29,39 @@ export type Dinner = {
   cookMinutes: number;
   tags: string[];
   ingredients: string[];
+  status?: RecipeStatus;
+  favorite?: boolean;
+  effortScore?: number;
+  noveltyScore?: number;
+  instructions?: string[];
+  source?: RecipeSource;
 };
 
 export type LunchOption = {
   id: string;
   name: string;
   ingredients: string[];
+  status?: RecipeStatus;
+  favorite?: boolean;
+  effortScore?: number;
+  noveltyScore?: number;
+  instructions?: string[];
+  source?: RecipeSource;
+  tags?: string[];
 };
 
+/** Legacy planner-facing shape derived from the catalog. */
 export type RecipeData = {
   servings: number;
   dinners: Dinner[];
   girlLunches: LunchOption[];
   boyLunches: LunchOption[];
+};
+
+export type CatalogData = {
+  schemaVersion: 2;
+  servings: number;
+  recipes: CatalogRecipe[];
 };
 
 export type Settings = {

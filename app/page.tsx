@@ -124,6 +124,12 @@ export default function Home() {
         </div>
         <div className="flex gap-2">
           <Link
+            href="/recipes"
+            className="rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900"
+          >
+            Recipes
+          </Link>
+          <Link
             href="/settings"
             className="rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900"
           >
