@@ -1,10 +1,7 @@
 import "server-only";
 
-import path from "path";
 import type { Settings } from "@/lib/types";
-import { AtomicJsonStore } from "./atomicJsonStore";
-
-const store = new AtomicJsonStore(path.join(process.cwd(), "data"));
+import { getDocumentStore } from "./getDocumentStore";
 
 function withDefaults(settings: Partial<Settings>): Settings {
   return {
@@ -18,10 +15,12 @@ function withDefaults(settings: Partial<Settings>): Settings {
 }
 
 export async function getSettings(): Promise<Settings> {
+  const store = await getDocumentStore();
   const settings = await store.readJson<Partial<Settings>>("settings.json");
   return withDefaults(settings);
 }
 
 export async function saveSettings(settings: Settings): Promise<void> {
+  const store = await getDocumentStore();
   await store.writeJson("settings.json", withDefaults(settings));
 }

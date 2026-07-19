@@ -4,6 +4,12 @@ import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { RecipeImport } from "@/lib/imports/types";
+import {
+  Button,
+  SectionHeading,
+  fieldClassName,
+  labelClassName
+} from "../components/brand";
 
 export default function ImportPage() {
   const router = useRouter();
@@ -43,73 +49,75 @@ export default function ImportPage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-lg px-6 py-10">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-wrap-balance">Import from TikTok</h1>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-          Paste a link, then add the caption/notes if needed. You always review before it joins next
-          week.
-        </p>
-      </div>
-
-      <form onSubmit={onSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="tiktok-url" className="mb-1 block text-sm font-medium">
-            TikTok URL
-          </label>
-          <input
-            id="tiktok-url"
-            required
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://www.tiktok.com/..."
-            className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
-          />
-        </div>
-        <div>
-          <label htmlFor="notes" className="mb-1 block text-sm font-medium">
-            Caption / notes (recommended fallback)
-          </label>
-          <textarea
-            id="notes"
-            rows={6}
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Paste the caption, ingredients, or steps from the video."
-            className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
-          />
-        </div>
-        {error && (
-          <p className="text-sm text-red-600 dark:text-red-400" role="alert">
-            {error}
+    <main className="mx-auto w-full max-w-xl px-6 py-10">
+        <div className="mb-10">
+          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-accent">
+            Import
           </p>
-        )}
-        <button
-          type="submit"
-          disabled={busy}
-          className="rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background disabled:opacity-50"
-        >
-          {busy ? "Analyzing…" : "Create draft"}
-        </button>
-      </form>
+          <h1 className="font-serif text-4xl font-semibold tracking-tight">
+            Import from TikTok
+          </h1>
+          <p className="mt-2 text-sm text-muted">
+            Paste a link, then add the caption/notes if needed. You always review before it joins
+            next week.
+          </p>
+        </div>
 
-      {imports.length > 0 && (
-        <section className="mt-10">
-          <h2 className="mb-3 text-lg font-semibold">Recent imports</h2>
-          <ul className="space-y-2">
-            {imports.slice(0, 8).map((item) => (
-              <li key={item.id}>
-                <Link
-                  href={`/import/${item.id}`}
-                  className="text-sm font-medium underline-offset-2 hover:underline"
-                >
-                  {item.draft.name} · {item.status}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-    </main>
+        <form onSubmit={onSubmit} className="space-y-5">
+          <div>
+            <label htmlFor="tiktok-url" className={labelClassName}>
+              TikTok URL
+            </label>
+            <input
+              id="tiktok-url"
+              required
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="https://www.tiktok.com/..."
+              className={fieldClassName}
+            />
+          </div>
+          <div>
+            <label htmlFor="notes" className={labelClassName}>
+              Caption / notes (recommended fallback)
+            </label>
+            <textarea
+              id="notes"
+              rows={6}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Paste the caption, ingredients, or steps from the video."
+              className={fieldClassName}
+            />
+          </div>
+          {error && (
+            <p className="text-sm text-accent" role="alert">
+              {error}
+            </p>
+          )}
+          <Button type="submit" disabled={busy}>
+            {busy ? "Analyzing…" : "Create draft"}
+          </Button>
+        </form>
+
+        {imports.length > 0 && (
+          <section className="mt-12">
+            <SectionHeading>Recent imports</SectionHeading>
+            <ul className="divide-y divide-border border-t border-border">
+              {imports.slice(0, 8).map((item) => (
+                <li key={item.id} className="py-3">
+                  <Link
+                    href={`/import/${item.id}`}
+                    className="font-serif text-lg font-semibold underline-offset-2 hover:underline"
+                  >
+                    {item.draft.name}
+                  </Link>
+                  <p className="text-[13px] text-meta">{item.status}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </main>
   );
 }

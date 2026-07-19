@@ -1,7 +1,7 @@
 import "server-only";
 
-// Local JSON repositories with atomic writes. Swap these adapters for Postgres
-// when DATABASE_URL is configured for hosted multi-device use.
+// Repositories prefer Cloudflare D1 when MEALS_DB is bound; otherwise they
+// fall back to AtomicJsonStore under data/ (local next start + vitest).
 export {
   getRecipes,
   listCatalogRecipes,

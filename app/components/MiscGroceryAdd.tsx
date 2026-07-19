@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import type { GrocerySection } from "@/lib/groceryList";
 import type { MiscGroceryItem } from "@/lib/types";
+import { Button, fieldClassName, labelClassName } from "./brand";
 
 type MiscResponse = {
   weekOf: string;
@@ -43,9 +44,9 @@ export function MiscGroceryAdd({
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-3">
+    <form onSubmit={onSubmit} className="space-y-4">
       <div>
-        <label htmlFor="misc-name" className="mb-1 block text-sm font-medium">
+        <label htmlFor="misc-name" className={labelClassName}>
           Add something else
         </label>
         <input
@@ -55,12 +56,12 @@ export function MiscGroceryAdd({
           required
           maxLength={80}
           placeholder="Paper towels, snacks, dog food…"
-          className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
+          className={fieldClassName}
         />
       </div>
       <div>
-        <label htmlFor="misc-note" className="mb-1 block text-sm font-medium">
-          Note <span className="font-normal text-zinc-500">(optional)</span>
+        <label htmlFor="misc-note" className={labelClassName}>
+          Note <span className="font-normal text-muted">(optional)</span>
         </label>
         <input
           id="misc-note"
@@ -68,21 +69,17 @@ export function MiscGroceryAdd({
           onChange={(e) => setNote(e.target.value)}
           maxLength={120}
           placeholder="Brand or size"
-          className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
+          className={fieldClassName}
         />
       </div>
       {error && (
-        <p className="text-sm text-red-600 dark:text-red-400" role="alert">
+        <p className="text-sm text-accent" role="alert">
           {error}
         </p>
       )}
-      <button
-        type="submit"
-        disabled={busy || name.trim().length === 0}
-        className="min-h-11 rounded-lg bg-foreground px-4 text-sm font-medium text-background disabled:opacity-50"
-      >
+      <Button type="submit" disabled={busy || name.trim().length === 0}>
         {busy ? "Adding…" : "Add to list"}
-      </button>
+      </Button>
     </form>
   );
 }

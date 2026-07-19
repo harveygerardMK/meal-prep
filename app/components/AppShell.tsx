@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
+import { cn } from "./brand";
 
 const primaryNav = [
   { href: "/", label: "Plan", match: (path: string) => path === "/" },
@@ -27,6 +28,13 @@ function isMoreActive(path: string) {
   return path.startsWith("/import") || path.startsWith("/settings");
 }
 
+function navLinkClass(active: boolean) {
+  return cn(
+    "transition-colors duration-150",
+    active ? "text-foreground" : "text-muted hover:text-foreground"
+  );
+}
+
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [moreOpen, setMoreOpen] = useState(false);
@@ -48,10 +56,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-full flex-col">
-      <header className="sticky top-0 z-20 hidden border-b border-zinc-200 bg-background/95 backdrop-blur-sm sm:block dark:border-zinc-800">
-        <div className="mx-auto flex h-14 w-full max-w-3xl items-center justify-between gap-4 px-6">
-          <p className="text-sm font-semibold tracking-tight">Weekly Meal Prep</p>
-          <nav aria-label="Main" className="flex items-center gap-1">
+      <header className="sticky top-0 z-20 hidden border-b border-border bg-background/95 backdrop-blur-sm sm:block">
+        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-6">
+          <Link
+            href="/"
+            className="font-serif text-[22px] font-semibold tracking-tight text-foreground"
+          >
+            Meal Prep
+          </Link>
+          <nav aria-label="Main" className="flex items-center gap-5 text-sm font-medium">
             {primaryNav.map((item) => {
               const active = item.match(pathname);
               return (
@@ -59,11 +72,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   key={item.href}
                   href={item.href}
                   aria-current={active ? "page" : undefined}
-                  className={`inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-medium ${
-                    active
-                      ? "bg-zinc-100 text-foreground dark:bg-zinc-800"
-                      : "text-zinc-600 hover:bg-zinc-50 hover:text-foreground dark:text-zinc-300 dark:hover:bg-zinc-900"
-                  }`}
+                  className={cn("inline-flex min-h-11 items-center", navLinkClass(active))}
                 >
                   {item.label}
                 </Link>
@@ -75,11 +84,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               aria-controls={moreId}
               aria-current={moreActive ? "page" : undefined}
               onClick={() => setMoreOpen(true)}
-              className={`inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-medium ${
-                moreActive
-                  ? "bg-zinc-100 text-foreground dark:bg-zinc-800"
-                  : "text-zinc-600 hover:bg-zinc-50 hover:text-foreground dark:text-zinc-300 dark:hover:bg-zinc-900"
-              }`}
+              className={cn("inline-flex min-h-11 items-center", navLinkClass(moreActive))}
             >
               More
             </button>
@@ -91,9 +96,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <nav
         aria-label="Main"
-        className="fixed inset-x-0 bottom-0 z-20 border-t border-zinc-200 bg-background/95 backdrop-blur-sm sm:hidden dark:border-zinc-800"
+        className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-background/95 backdrop-blur-sm sm:hidden"
       >
-        <ul className="mx-auto grid max-w-3xl grid-cols-4">
+        <ul className="mx-auto grid max-w-6xl grid-cols-4">
           {primaryNav.map((item) => {
             const active = item.match(pathname);
             return (
@@ -101,11 +106,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <Link
                   href={item.href}
                   aria-current={active ? "page" : undefined}
-                  className={`flex min-h-14 flex-col items-center justify-center px-2 text-xs font-medium ${
-                    active
-                      ? "text-foreground"
-                      : "text-zinc-500 dark:text-zinc-400"
-                  }`}
+                  className={cn(
+                    "flex min-h-14 flex-col items-center justify-center px-2 text-xs font-semibold",
+                    navLinkClass(active)
+                  )}
                 >
                   {item.label}
                 </Link>
@@ -119,11 +123,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               aria-controls={moreId}
               aria-current={moreActive ? "page" : undefined}
               onClick={() => setMoreOpen(true)}
-              className={`flex min-h-14 w-full flex-col items-center justify-center px-2 text-xs font-medium ${
-                moreActive
-                  ? "text-foreground"
-                  : "text-zinc-500 dark:text-zinc-400"
-              }`}
+              className={cn(
+                "flex min-h-14 w-full flex-col items-center justify-center px-2 text-xs font-semibold",
+                navLinkClass(moreActive)
+              )}
             >
               More
             </button>
@@ -134,14 +137,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <dialog
         ref={dialogRef}
         id={moreId}
-        className="fixed inset-x-4 bottom-20 top-auto m-0 w-[calc(100%-2rem)] max-w-sm rounded-xl border border-zinc-200 bg-background p-0 text-foreground shadow-lg backdrop:bg-black/40 open:flex open:flex-col sm:inset-auto sm:top-1/2 sm:left-1/2 sm:bottom-auto sm:-translate-x-1/2 sm:-translate-y-1/2 dark:border-zinc-800"
+        className="fixed inset-x-4 bottom-20 top-auto m-0 w-[calc(100%-2rem)] max-w-sm rounded border border-border bg-background p-0 text-foreground shadow-lg backdrop:bg-black/40 open:flex open:flex-col sm:inset-auto sm:top-1/2 sm:left-1/2 sm:bottom-auto sm:-translate-x-1/2 sm:-translate-y-1/2"
         onClose={() => setMoreOpen(false)}
         onClick={(event) => {
           if (event.target === dialogRef.current) setMoreOpen(false);
         }}
       >
-        <div className="border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
-          <h2 className="text-sm font-semibold">More</h2>
+        <div className="border-b border-border px-4 py-3">
+          <h2 className="font-serif text-base font-semibold">More</h2>
         </div>
         <ul className="p-2">
           {moreLinks.map((item) => {
@@ -151,11 +154,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <Link
                   href={item.href}
                   aria-current={active ? "page" : undefined}
-                  className={`flex min-h-11 items-center rounded-lg px-3 text-sm font-medium ${
-                    active
-                      ? "bg-zinc-100 dark:bg-zinc-800"
-                      : "hover:bg-zinc-50 dark:hover:bg-zinc-900"
-                  }`}
+                  className={cn(
+                    "flex min-h-11 items-center rounded px-3 text-sm font-medium",
+                    active ? "bg-accent-soft text-foreground" : "hover:bg-accent-soft"
+                  )}
                   onClick={() => setMoreOpen(false)}
                 >
                   {item.label}
@@ -164,10 +166,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             );
           })}
         </ul>
-        <div className="border-t border-zinc-200 p-2 dark:border-zinc-800">
+        <div className="border-t border-border p-2">
           <button
             type="button"
-            className="flex min-h-11 w-full items-center justify-center rounded-lg text-sm font-medium text-zinc-600 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-900"
+            className="flex min-h-11 w-full items-center justify-center rounded text-sm font-medium text-muted hover:bg-accent-soft hover:text-foreground"
             onClick={() => setMoreOpen(false)}
           >
             Close

@@ -16,6 +16,11 @@
 # next.js
 /.next/
 /out/
+.open-next
+
+# cloudflare
+.dev.vars
+.wrangler
 
 # git worktrees
 .worktrees/

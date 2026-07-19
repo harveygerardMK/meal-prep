@@ -2,6 +2,12 @@
 
 import { useEffect, useState } from "react";
 import type { Settings } from "@/lib/types";
+import {
+  Button,
+  LinkButton,
+  fieldClassName,
+  labelClassName
+} from "../components/brand";
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState<Settings | null>(null);
@@ -71,24 +77,6 @@ export default function SettingsPage() {
     }
   }
 
-  if (error && !settings) {
-    return (
-      <main className="mx-auto max-w-lg px-6 py-16 text-center">
-        <p className="text-red-600 dark:text-red-400" role="alert">
-          {error}
-        </p>
-      </main>
-    );
-  }
-
-  if (!settings) {
-    return (
-      <main className="mx-auto max-w-lg px-6 py-16 text-center text-zinc-500">
-        Loading settings…
-      </main>
-    );
-  }
-
   const fields: { key: keyof Settings; label: string; hint: string }[] = [
     {
       key: "dinnersPerWeek",
@@ -123,68 +111,87 @@ export default function SettingsPage() {
   ];
 
   return (
-    <main className="mx-auto w-full max-w-lg px-6 py-10">
-      <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h1 className="text-2xl font-bold">Settings</h1>
-        <button
-          type="button"
-          onClick={logout}
-          className="min-h-11 rounded-lg border border-zinc-200 px-4 text-sm font-medium text-zinc-600 hover:bg-zinc-50 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-900"
-        >
-          Log out
-        </button>
-      </div>
-
-      {error && (
-        <p className="mb-4 text-sm text-red-600 dark:text-red-400" role="alert">
-          {error}
-        </p>
-      )}
-
-      <div className="space-y-5">
-        {fields.map((field) => {
-          const inputId = `setting-${field.key}`;
-          return (
-            <div key={field.key}>
-              <label htmlFor={inputId} className="mb-1 block text-sm font-medium">
-                {field.label}
-              </label>
-              <input
-                id={inputId}
-                type="number"
-                min={1}
-                max={
-                  field.key === "cookEffortTarget" || field.key === "noveltyTarget"
-                    ? 5
-                    : undefined
-                }
-                value={settings[field.key]}
-                onChange={(e) =>
-                  setSettings({ ...settings, [field.key]: Number(e.target.value) })
-                }
-                className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
-              />
-              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{field.hint}</p>
+    <main className="mx-auto w-full max-w-xl px-6 py-10">
+        {error && !settings ? (
+          <p className="text-center text-accent" role="alert">
+            {error}
+          </p>
+        ) : !settings ? (
+          <p className="text-center text-muted">Loading settings…</p>
+        ) : (
+          <>
+            <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-accent">
+                  Preferences
+                </p>
+                <h1 className="font-serif text-4xl font-semibold tracking-tight">Settings</h1>
+                <p className="mt-2 text-sm text-muted">
+                  Tune how the weekly plan is generated.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <LinkButton href="/" variant="secondary">
+                  Back to plan
+                </LinkButton>
+                <Button type="button" variant="ghost" onClick={logout}>
+                  Log out
+                </Button>
+              </div>
             </div>
-          );
-        })}
-      </div>
 
-      <button
-        type="button"
-        onClick={save}
-        disabled={busy}
-        aria-busy={busy}
-        className="mt-8 min-h-11 rounded-lg bg-foreground px-5 text-sm font-medium text-background disabled:opacity-50"
-      >
-        {busy ? "Saving…" : saved ? "Saved!" : "Save settings"}
-      </button>
-      {saved && (
-        <p className="mt-2 text-sm text-emerald-700 dark:text-emerald-400" aria-live="polite">
-          Settings saved. Regenerate the plan on the home page to apply dinner-count or cook-time
-          changes to this week.
-        </p>
-      )}
-    </main>
+            {error && (
+              <p className="mb-4 text-sm text-accent" role="alert">
+                {error}
+              </p>
+            )}
+
+            <div className="space-y-6">
+              {fields.map((field) => {
+                const inputId = `setting-${field.key}`;
+                return (
+                  <div key={field.key} className="border-t border-border pt-5">
+                    <label htmlFor={inputId} className={labelClassName}>
+                      {field.label}
+                    </label>
+                    <input
+                      id={inputId}
+                      type="number"
+                      min={1}
+                      max={
+                        field.key === "cookEffortTarget" || field.key === "noveltyTarget"
+                          ? 5
+                          : undefined
+                      }
+                      value={settings[field.key]}
+                      onChange={(e) =>
+                        setSettings({ ...settings, [field.key]: Number(e.target.value) })
+                      }
+                      className={fieldClassName}
+                    />
+                    <p className="mt-1.5 text-[13px] text-meta">{field.hint}</p>
+                  </div>
+                );
+              })}
+            </div>
+
+            <Button
+              type="button"
+              onClick={save}
+              disabled={busy}
+              aria-busy={busy}
+              className="mt-8"
+            >
+              {busy ? "Saving…" : saved ? "Saved!" : "Save settings"}
+            </Button>
+            {saved && (
+              <p className="mt-3 text-sm text-success" aria-live="polite">
+                Settings saved. Regenerate the plan on the home page to apply dinner-count or
+                cook-time changes to this week.
+              </p>
+            )}
+          </>
+        )}
+      </main>
   );
 }

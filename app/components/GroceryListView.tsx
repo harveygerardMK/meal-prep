@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
 import type { GrocerySection } from "@/lib/groceryList";
+import { LinkButton } from "./brand";
 
 export const groceryStorageKey = (weekOf: string) =>
   `meal-prep:grocery-checked:${weekOf}`;
@@ -102,33 +102,34 @@ export function GroceryListView({
   return (
     <div className="space-y-3">
       {error && (
-        <p className="text-sm text-red-600 dark:text-red-400" role="alert">
+        <p className="text-sm text-accent" role="alert">
           {error}
         </p>
       )}
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-8 sm:grid-cols-2">
         {sections.map((section) => (
-          <div
-            key={section.section}
-            className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
-          >
-            <h3 className="mb-2 font-semibold">{section.section}</h3>
-            <ul className="space-y-2 text-sm">
+          <div key={section.section} className="border-t border-border pt-4">
+            <h3 className="mb-3 text-sm font-semibold text-foreground">
+              {section.section}
+            </h3>
+            <ul className="space-y-3 text-sm">
               {section.items.map((item) => {
                 const key = itemCheckKey(item);
                 const isChecked = checked.has(key);
                 return (
                   <li key={key} className="flex items-start gap-2">
-                    <label className="flex min-h-11 flex-1 items-start gap-2 py-1">
+                    <label className="flex min-h-11 flex-1 cursor-pointer items-start gap-3 py-1">
                       <input
                         type="checkbox"
-                        className="mt-1"
+                        className="mt-1 h-4 w-4 accent-[var(--accent)]"
                         checked={isChecked}
                         onChange={() => toggleGroceryChecked(weekOf, key, checked)}
                       />
                       <span className={isChecked ? "opacity-60 line-through" : undefined}>
-                        <span className="font-medium capitalize">{item.name}</span>
-                        <span className="block text-xs text-zinc-600 dark:text-zinc-300">
+                        <span className="font-medium capitalize text-foreground">
+                          {item.name}
+                        </span>
+                        <span className="mt-0.5 block text-[13px] text-meta">
                           {item.entries.map((e) => e.text).join("; ")}
                         </span>
                       </span>
@@ -138,7 +139,7 @@ export function GroceryListView({
                         type="button"
                         onClick={() => removeMisc(item.miscId!)}
                         disabled={removingId === item.miscId}
-                        className="min-h-11 shrink-0 px-2 text-sm font-medium text-zinc-600 underline-offset-2 hover:underline disabled:opacity-50 dark:text-zinc-300"
+                        className="min-h-11 shrink-0 px-2 text-sm font-semibold text-muted underline-offset-2 hover:text-foreground hover:underline disabled:opacity-50"
                       >
                         {removingId === item.miscId ? "…" : "Remove"}
                       </button>
@@ -168,32 +169,29 @@ export function GrocerySummary({
   const remaining = Math.max(0, unchecked.length - preview.length);
 
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
-      <p className="text-sm text-zinc-600 dark:text-zinc-300">
+    <div className="border-t border-border pt-4">
+      <p className="text-sm text-muted">
         {items.length} items · {unchecked.length} still to get
       </p>
       {preview.length > 0 ? (
         <ul className="mt-3 space-y-1 text-sm">
           {preview.map((item) => (
-            <li key={item.checkKey} className="capitalize text-zinc-700 dark:text-zinc-200">
+            <li key={item.checkKey} className="capitalize text-foreground">
               {item.name}
             </li>
           ))}
           {remaining > 0 && (
-            <li className="text-zinc-500 dark:text-zinc-400">+{remaining} more</li>
+            <li className="text-meta">+{remaining} more</li>
           )}
         </ul>
       ) : (
-        <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-300">
+        <p className="mt-3 text-sm text-muted">
           Everything checked off for this week.
         </p>
       )}
-      <Link
-        href="/shopping"
-        className="mt-4 inline-flex min-h-11 items-center rounded-lg bg-foreground px-4 text-sm font-medium text-background"
-      >
+      <LinkButton href="/shopping" className="mt-4">
         Open shopping list
-      </Link>
+      </LinkButton>
     </div>
   );
 }

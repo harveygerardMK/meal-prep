@@ -1,16 +1,15 @@
 import "server-only";
 
-import path from "path";
 import type { PlanQueueItem } from "@/lib/imports/types";
-import { AtomicJsonStore } from "./atomicJsonStore";
+import { getDocumentStore } from "./getDocumentStore";
 
-const store = new AtomicJsonStore(path.join(process.cwd(), "data"));
 const FILE = "plan-queue.json";
 
 type QueueFile = { items: PlanQueueItem[] };
 
 async function readAll(): Promise<QueueFile> {
   try {
+    const store = await getDocumentStore();
     return await store.readJson<QueueFile>(FILE);
   } catch {
     return { items: [] };
@@ -28,6 +27,7 @@ export async function listPendingForWeek(weekOf: string): Promise<PlanQueueItem[
 }
 
 export async function addQueueItem(item: PlanQueueItem): Promise<PlanQueueItem> {
+  const store = await getDocumentStore();
   const file = await readAll();
   file.items.unshift(item);
   await store.writeJson(FILE, file);
@@ -36,6 +36,7 @@ export async function addQueueItem(item: PlanQueueItem): Promise<PlanQueueItem> 
 
 export async function markQueueConsumed(ids: string[]): Promise<void> {
   if (ids.length === 0) return;
+  const store = await getDocumentStore();
   const idSet = new Set(ids);
   const file = await readAll();
   file.items = file.items.map((item) =>

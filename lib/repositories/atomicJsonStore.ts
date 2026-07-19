@@ -1,11 +1,12 @@
 import fs from "fs/promises";
 import path from "path";
+import type { DocumentStore } from "./documentStore";
 
 /**
  * JSON document store with temp-file rename writes and per-file serialization.
  * Suitable for local/self-hosted durable disks. Not a multi-instance database.
  */
-export class AtomicJsonStore {
+export class AtomicJsonStore implements DocumentStore {
   private readonly queues = new Map<string, Promise<unknown>>();
 
   constructor(private readonly dataDir: string) {}

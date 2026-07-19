@@ -8,9 +8,19 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "preview": "node scripts/cloudflare-build.mjs preview",
+    "deploy": "node scripts/cloudflare-build.mjs deploy",
+    "cf-build": "node scripts/cloudflare-build.mjs build",
+    "upload": "node scripts/cloudflare-build.mjs upload",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv --include-runtime false cloudflare-env.d.ts",
+    "db:migrate:local": "wrangler d1 migrations apply meal-prep-db --local",
+    "db:migrate:remote": "wrangler d1 migrations apply meal-prep-db --remote",
+    "db:seed:local": "node scripts/seed-d1.mjs --local",
+    "db:seed:remote": "node scripts/seed-d1.mjs --remote"
   },
   "dependencies": {
+    "@opennextjs/cloudflare": "^1.20.1",
     "jose": "^6.2.3",
     "next": "16.2.10",
     "react": "19.2.4",
@@ -27,6 +37,7 @@
     "eslint-config-next": "16.2.10",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.10",
+    "wrangler": "^4.112.0"
   }
 }

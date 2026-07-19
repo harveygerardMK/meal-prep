@@ -2,25 +2,49 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #121212;
+  --muted: #6b6b6b;
+  --meta: #757575;
+  --border: #e5e5e5;
+  --card: #ffffff;
+  --accent: #e33d26;
+  --accent-hover: #c73420;
+  --accent-foreground: #ffffff;
+  --accent-soft: #fdf0ee;
+  --photo-wash-1: #f3ede6;
+  --photo-wash-2: #e8efea;
+  --photo-wash-3: #ede8f0;
+  --locked: #e33d26;
+  --success: #2f6f4e;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-muted: var(--muted);
+  --color-meta: var(--meta);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-soft: var(--accent-soft);
+  --color-photo-wash-1: var(--photo-wash-1);
+  --color-photo-wash-2: var(--photo-wash-2);
+  --color-photo-wash-3: var(--photo-wash-3);
+  --color-locked: var(--locked);
+  --color-success: var(--success);
+  --font-sans: var(--font-source-sans);
+  --font-serif: var(--font-source-serif);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-source-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--foreground);
 }

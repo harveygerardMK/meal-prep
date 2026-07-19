@@ -1,15 +1,12 @@
 import "server-only";
 
-import path from "path";
 import type { CatalogData, CatalogRecipe, RecipeData } from "@/lib/types";
 import {
   legacyRecipeDataToCatalog,
   recipeToPlannerViews,
 } from "@/lib/recipes/recipeValidation";
-import { AtomicJsonStore } from "./atomicJsonStore";
+import { getDocumentStore } from "./getDocumentStore";
 import { getHistory } from "./planRepository";
-
-const store = new AtomicJsonStore(path.join(process.cwd(), "data"));
 
 type StoredRecipes = CatalogData | RecipeData;
 
@@ -24,6 +21,7 @@ function isCatalogData(data: StoredRecipes): data is CatalogData {
 }
 
 async function readCatalog(): Promise<CatalogData> {
+  const store = await getDocumentStore();
   const raw = await store.readJson<StoredRecipes>("recipes.json");
   if (isCatalogData(raw)) {
     return raw;
@@ -36,6 +34,7 @@ async function readCatalog(): Promise<CatalogData> {
 }
 
 async function writeCatalog(catalog: CatalogData): Promise<void> {
+  const store = await getDocumentStore();
   await store.writeJson("recipes.json", catalog);
 }
 

@@ -1,20 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Source_Sans_3, Source_Serif_4 } from "next/font/google";
 import { AppShell } from "./components/AppShell";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const sourceSans = Source_Sans_3({
+  variable: "--font-source-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const sourceSerif = Source_Serif_4({
+  variable: "--font-source-serif",
   subsets: ["latin"],
+  weight: ["400", "600", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "Weekly Meal Prep",
+  title: "Meal Prep",
   description: "Weekly dinner plan, kid lunches, and grocery list",
 };
 
@@ -26,7 +28,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${sourceSans.variable} ${sourceSerif.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col font-sans">
         <AppShell>{children}</AppShell>
