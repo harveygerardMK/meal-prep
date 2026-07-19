@@ -1,4 +1,4 @@
-import type { ResolvedWeekPlan } from "./types";
+import type { ResolvedWeekPlan, StapleItem } from "./types";
 
 export type GroceryEntry = { text: string; source: string };
 export type GroceryItem = {
@@ -10,6 +10,10 @@ export type GroceryItem = {
   miscId?: string;
 };
 export type GrocerySection = { section: string; items: GroceryItem[] };
+export type GroceryListOptions = {
+  includeStaples: boolean;
+  staples: StapleItem[];
+};
 
 export const MISC_SECTION = "Miscellaneous";
 
@@ -62,7 +66,10 @@ function categorize(name: string): string {
   return "Other";
 }
 
-export function buildGroceryList(plan: ResolvedWeekPlan): GrocerySection[] {
+export function buildGroceryList(
+  plan: ResolvedWeekPlan,
+  options?: GroceryListOptions
+): GrocerySection[] {
   const entries: { text: string; source: string }[] = [];
 
   for (const dinner of plan.dinners) {
@@ -86,9 +93,26 @@ export function buildGroceryList(plan: ResolvedWeekPlan): GrocerySection[] {
     grouped.get(key)!.entries.push(entry);
   }
 
+  const forcedSections = new Map<string, string>();
+  if (options?.includeStaples) {
+    for (const staple of options.staples) {
+      const key = coreName(staple.name);
+      forcedSections.set(key, staple.section);
+      const existing = grouped.get(key);
+      if (existing) {
+        existing.entries.push({ text: staple.name, source: "Household staple" });
+        continue;
+      }
+
+      grouped.set(key, {
+        name: staple.name,
+        entries: [{ text: staple.name, source: "Household staple" }],
+      });
+    }
+  }
   const bySection = new Map<string, GroceryItem[]>();
   for (const item of grouped.values()) {
-    const section = categorize(item.name);
+    const section = forcedSections.get(coreName(item.name)) ?? categorize(item.name);
     if (!bySection.has(section)) bySection.set(section, []);
     bySection.get(section)!.push(item);
   }

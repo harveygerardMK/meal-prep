@@ -11,6 +11,7 @@ export {
   isRecipeReferencedInHistory,
 } from "./repositories/recipeRepository";
 export { getSettings, saveSettings } from "./repositories/settingsRepository";
+export { getStaples, saveStaples } from "./repositories/staplesRepository";
 export {
   getHistory,
   saveHistory,

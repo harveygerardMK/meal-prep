@@ -11,6 +11,7 @@ function withDefaults(settings: Partial<Settings>): Settings {
     servings: settings.servings ?? 4,
     cookEffortTarget: settings.cookEffortTarget ?? 3,
     noveltyTarget: settings.noveltyTarget ?? 3,
+    includeStaplesInGroceryList: settings.includeStaplesInGroceryList ?? true,
   };
 }
 

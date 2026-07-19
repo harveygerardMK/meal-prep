@@ -7,7 +7,7 @@ import {
 } from "@/lib/planGenerator";
 import { buildGroceryList } from "@/lib/groceryList";
 import { parseLocks, parseWeekPreferences } from "@/lib/validation";
-import { getSettings } from "@/lib/dataStore";
+import { getSettings, getStaples } from "@/lib/dataStore";
 
 function errorResponse(error: unknown, fallbackStatus = 500) {
   if (error instanceof PlanNotFoundError) {
@@ -19,10 +19,18 @@ function errorResponse(error: unknown, fallbackStatus = 500) {
   return NextResponse.json({ error: message }, { status });
 }
 
+async function groceryListFor(plan: Awaited<ReturnType<typeof getCurrentPlan>>) {
+  const [settings, staples] = await Promise.all([getSettings(), getStaples()]);
+  return buildGroceryList(plan, {
+    includeStaples: settings.includeStaplesInGroceryList,
+    staples: staples.items,
+  });
+}
+
 export async function GET() {
   try {
     const plan = await getCurrentPlan();
-    const groceryList = buildGroceryList(plan);
+    const groceryList = await groceryListFor(plan);
     return NextResponse.json({ plan, groceryList });
   } catch (error) {
     return errorResponse(error);
@@ -41,13 +49,13 @@ export async function POST(req: NextRequest) {
 
     if (action === "ensure") {
       const plan = await ensureCurrentPlan(preferences);
-      const groceryList = buildGroceryList(plan);
+      const groceryList = await groceryListFor(plan);
       return NextResponse.json({ plan, groceryList });
     }
 
     const locks = parseLocks(body?.locks);
     const plan = await regenerateCurrentPlan(locks, preferences);
-    const groceryList = buildGroceryList(plan);
+    const groceryList = await groceryListFor(plan);
     return NextResponse.json({ plan, groceryList });
   } catch (error) {
     return errorResponse(error);

@@ -1,0 +1,9 @@
+{
+  "items": [
+    { "id": "milk", "name": "Milk", "section": "Dairy & Eggs" },
+    { "id": "eggs", "name": "Eggs", "section": "Dairy & Eggs" },
+    { "id": "sandwich-bread", "name": "Sandwich bread", "section": "Bakery & Bread" },
+    { "id": "butter", "name": "Butter", "section": "Dairy & Eggs" },
+    { "id": "bananas", "name": "Bananas", "section": "Produce" }
+  ]
+}

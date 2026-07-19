@@ -98,4 +98,51 @@ describe("buildGroceryList", () => {
     expect(misc?.items[0]?.miscId).toBe("misc-1");
     expect(misc?.items[0]?.checkKey).toBe("misc:misc-1");
   });
+
+  it("merges staples into store sections when enabled", () => {
+    const sections = buildGroceryList(planFixture(), {
+      includeStaples: true,
+      staples: [{ id: "s1", name: "Milk", section: "Dairy & Eggs" }],
+    });
+    const dairy = sections.find((s) => s.section === "Dairy & Eggs");
+    expect(dairy?.items.some((i) => i.name === "Milk")).toBe(true);
+    expect(sections.find((s) => s.section === "Miscellaneous")?.items.some((i) => i.name === "Milk")).toBeFalsy();
+  });
+
+  it("omits staples when disabled without dropping misc", () => {
+    const sections = buildGroceryList(
+      planFixture({
+        miscGrocery: [
+          { id: "m1", name: "Paper towels", addedAt: "2026-07-19T00:00:00.000Z" },
+        ],
+      }),
+      { includeStaples: false, staples: [{ id: "s1", name: "Milk", section: "Dairy & Eggs" }] }
+    );
+    expect(sections.flatMap((s) => s.items).some((i) => i.name === "Milk")).toBe(false);
+    expect(sections.find((s) => s.section === "Miscellaneous")?.items[0]?.name).toBe(
+      "Paper towels"
+    );
+  });
+
+  it("uses a staple's explicit section when it merges with an ingredient", () => {
+    const sections = buildGroceryList(
+      planFixture({
+        dinners: [
+          {
+            id: "beans",
+            name: "Beans",
+            protein: "vegetarian",
+            cookMinutes: 20,
+            tags: [],
+            ingredients: ["1 can beans"],
+          },
+        ],
+        girlLunch: { id: "g", name: "G", ingredients: [] },
+        boyLunch: { id: "b", name: "B", ingredients: [] },
+      }),
+      { includeStaples: true, staples: [{ id: "s1", name: "Beans", section: "Other" }] }
+    );
+    const beans = sections.find((s) => s.section === "Other")?.items.find((i) => i.name === "Beans");
+    expect(beans?.entries.some((entry) => entry.source === "Household staple")).toBe(true);
+  });
 });

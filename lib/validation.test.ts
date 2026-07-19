@@ -17,6 +17,7 @@ describe("parseSettings", () => {
       servings: 4,
       cookEffortTarget: 3,
       noveltyTarget: 3,
+      includeStaplesInGroceryList: true,
     });
   });
 

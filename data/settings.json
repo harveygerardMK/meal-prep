@@ -4,5 +4,6 @@
   "noRepeatWeeks": 3,
   "servings": 4,
   "cookEffortTarget": 3,
-  "noveltyTarget": 3
+  "noveltyTarget": 3,
+  "includeStaplesInGroceryList": true
 }

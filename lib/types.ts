@@ -76,6 +76,26 @@ export type Settings = {
   servings: number;
   cookEffortTarget: number;
   noveltyTarget: number;
+  includeStaplesInGroceryList: boolean;
+};
+
+export type GrocerySectionName =
+  | "Produce"
+  | "Meat & Seafood"
+  | "Dairy & Eggs"
+  | "Bakery & Bread"
+  | "Frozen"
+  | "Pantry & Dry Goods"
+  | "Other";
+
+export type StapleItem = {
+  id: string;
+  name: string;
+  section: GrocerySectionName;
+};
+
+export type StaplesData = {
+  items: StapleItem[];
 };
 
 export type Locks = {

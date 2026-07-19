@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { Settings } from "@/lib/types";
+import type { GrocerySectionName, Settings, StapleItem } from "@/lib/types";
 import {
   Button,
   LinkButton,
@@ -11,6 +11,7 @@ import {
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState<Settings | null>(null);
+  const [staples, setStaples] = useState<StapleItem[]>([]);
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,12 +21,24 @@ export default function SettingsPage() {
     async function load() {
       setError(null);
       try {
-        const res = await fetch("/api/settings");
-        const json = await res.json();
-        if (!res.ok) {
-          throw new Error(json.error || "Failed to load settings");
+        const [settingsRes, staplesRes] = await Promise.all([
+          fetch("/api/settings"),
+          fetch("/api/staples"),
+        ]);
+        const [settingsJson, staplesJson] = await Promise.all([
+          settingsRes.json(),
+          staplesRes.json(),
+        ]);
+        if (!settingsRes.ok) {
+          throw new Error(settingsJson.error || "Failed to load settings");
         }
-        if (!cancelled) setSettings(json as Settings);
+        if (!staplesRes.ok) {
+          throw new Error(staplesJson.error || "Failed to load staples");
+        }
+        if (!cancelled) {
+          setSettings(settingsJson as Settings);
+          setStaples((staplesJson as { items: StapleItem[] }).items);
+        }
       } catch (err) {
         if (!cancelled) {
           setError(err instanceof Error ? err.message : "Failed to load settings");
@@ -58,16 +71,30 @@ export default function SettingsPage() {
     setError(null);
     setSaved(false);
     try {
-      const res = await fetch("/api/settings", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(settings),
-      });
-      const json = await res.json();
-      if (!res.ok) {
-        throw new Error(json.error || "Failed to save settings");
+      const [settingsRes, staplesRes] = await Promise.all([
+        fetch("/api/settings", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(settings),
+        }),
+        fetch("/api/staples", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ items: staples }),
+        }),
+      ]);
+      const [settingsJson, staplesJson] = await Promise.all([
+        settingsRes.json(),
+        staplesRes.json(),
+      ]);
+      if (!settingsRes.ok) {
+        throw new Error(settingsJson.error || "Failed to save settings");
       }
-      setSettings(json as Settings);
+      if (!staplesRes.ok) {
+        throw new Error(staplesJson.error || "Failed to save staples");
+      }
+      setSettings(settingsJson as Settings);
+      setStaples((staplesJson as { items: StapleItem[] }).items);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch (err) {
@@ -77,7 +104,17 @@ export default function SettingsPage() {
     }
   }
 
-  const fields: { key: keyof Settings; label: string; hint: string }[] = [
+  const fields: {
+    key:
+      | "dinnersPerWeek"
+      | "maxCookMinutes"
+      | "noRepeatWeeks"
+      | "servings"
+      | "cookEffortTarget"
+      | "noveltyTarget";
+    label: string;
+    hint: string;
+  }[] = [
     {
       key: "dinnersPerWeek",
       label: "Dinners per week",
@@ -109,6 +146,30 @@ export default function SettingsPage() {
       hint: "Default weekly slider for repeats vs trying something different.",
     },
   ];
+  const grocerySections: GrocerySectionName[] = [
+    "Produce",
+    "Meat & Seafood",
+    "Dairy & Eggs",
+    "Bakery & Bread",
+    "Frozen",
+    "Pantry & Dry Goods",
+    "Other",
+  ];
+
+  function updateStaple(id: string, changes: Partial<StapleItem>) {
+    setStaples(staples.map((staple) => (staple.id === id ? { ...staple, ...changes } : staple)));
+  }
+
+  function addStaple() {
+    setStaples([
+      ...staples,
+      {
+        id: crypto.randomUUID(),
+        name: "",
+        section: "Other",
+      },
+    ]);
+  }
 
   return (
     <main className="mx-auto w-full max-w-xl px-6 py-10">
@@ -173,6 +234,78 @@ export default function SettingsPage() {
                   </div>
                 );
               })}
+              <div className="border-t border-border pt-5">
+                <label className={labelClassName} htmlFor="include-staples">
+                  Include household staples
+                </label>
+                <div className="mt-2 flex items-center gap-3">
+                  <input
+                    id="include-staples"
+                    type="checkbox"
+                    checked={settings.includeStaplesInGroceryList}
+                    onChange={(e) =>
+                      setSettings({
+                        ...settings,
+                        includeStaplesInGroceryList: e.target.checked,
+                      })
+                    }
+                  />
+                  <span className="text-sm text-muted">
+                    Add these recurring items to each grocery list.
+                  </span>
+                </div>
+              </div>
+              <div className="border-t border-border pt-5">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className={labelClassName}>Household staples</p>
+                    <p className="mt-1.5 text-[13px] text-meta">
+                      Reusable basics; weekly one-off items still belong in Miscellaneous.
+                    </p>
+                  </div>
+                  <Button type="button" variant="secondary" onClick={addStaple}>
+                    Add staple
+                  </Button>
+                </div>
+                <div className="mt-4 space-y-3">
+                  {staples.map((staple) => (
+                    <div key={staple.id} className="flex flex-col gap-2 sm:flex-row">
+                      <input
+                        aria-label={`Staple name for ${staple.name || "new item"}`}
+                        value={staple.name}
+                        onChange={(e) => updateStaple(staple.id, { name: e.target.value })}
+                        className={fieldClassName}
+                        placeholder="Staple name"
+                      />
+                      <select
+                        aria-label={`Store section for ${staple.name || "new item"}`}
+                        value={staple.section}
+                        onChange={(e) =>
+                          updateStaple(staple.id, {
+                            section: e.target.value as GrocerySectionName,
+                          })
+                        }
+                        className={fieldClassName}
+                      >
+                        {grocerySections.map((section) => (
+                          <option key={section} value={section}>
+                            {section}
+                          </option>
+                        ))}
+                      </select>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        onClick={() =>
+                          setStaples(staples.filter((item) => item.id !== staple.id))
+                        }
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <Button

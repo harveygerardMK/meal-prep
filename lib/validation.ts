@@ -1,4 +1,20 @@
-import type { Locks, Settings, WeekPreferences } from "./types";
+import type {
+  GrocerySectionName,
+  Locks,
+  Settings,
+  StaplesData,
+  WeekPreferences,
+} from "./types";
+
+const GROCERY_SECTIONS: GrocerySectionName[] = [
+  "Produce",
+  "Meat & Seafood",
+  "Dairy & Eggs",
+  "Bakery & Bread",
+  "Frozen",
+  "Pantry & Dry Goods",
+  "Other",
+];
 
 function requirePositiveInt(value: unknown, field: string): number {
   if (typeof value !== "number" || !Number.isInteger(value) || value < 1) {
@@ -23,6 +39,13 @@ function requireNullableId(value: unknown, field: string): string | null {
   return value;
 }
 
+function requireString(value: unknown, field: string): string {
+  if (typeof value !== "string" || value.trim().length === 0) {
+    throw new Error(`Invalid ${field}: expected a non-empty string`);
+  }
+  return value.trim();
+}
+
 export function parseSettings(input: unknown): Settings {
   if (!input || typeof input !== "object") {
     throw new Error("Invalid settings: expected an object");
@@ -35,6 +58,46 @@ export function parseSettings(input: unknown): Settings {
     servings: requirePositiveInt(body.servings, "servings"),
     cookEffortTarget: requireScore(body.cookEffortTarget, "cookEffortTarget"),
     noveltyTarget: requireScore(body.noveltyTarget, "noveltyTarget"),
+    includeStaplesInGroceryList:
+      body.includeStaplesInGroceryList === undefined
+        ? true
+        : typeof body.includeStaplesInGroceryList === "boolean"
+          ? body.includeStaplesInGroceryList
+          : (() => {
+              throw new Error(
+                "Invalid includeStaplesInGroceryList: expected a boolean"
+              );
+            })(),
+  };
+}
+
+export function parseStaples(input: unknown): StaplesData {
+  if (!input || typeof input !== "object") {
+    throw new Error("Invalid staples: expected an object");
+  }
+  const body = input as Record<string, unknown>;
+  if (!Array.isArray(body.items)) {
+    throw new Error("Invalid staples: items must be an array");
+  }
+  return {
+    items: body.items.map((item, index) => {
+      if (!item || typeof item !== "object") {
+        throw new Error(`Invalid staple at index ${index}: expected an object`);
+      }
+      const staple = item as Record<string, unknown>;
+      const section = staple.section;
+      if (
+        typeof section !== "string" ||
+        !GROCERY_SECTIONS.includes(section as GrocerySectionName)
+      ) {
+        throw new Error(`Invalid staple at index ${index}: unknown section`);
+      }
+      return {
+        id: requireString(staple.id, `staple id at index ${index}`),
+        name: requireString(staple.name, `staple name at index ${index}`),
+        section: section as GrocerySectionName,
+      };
+    }),
   };
 }
 
