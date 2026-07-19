@@ -4,6 +4,7 @@ export { LinkButton } from "./LinkButton";
 export { CardActionButton, RecipeCard } from "./RecipeCard";
 export { EmptyPhoto } from "./EmptyPhoto";
 export { MetaRow } from "./MetaRow";
+export { Panel, panelClass } from "./Panel";
 export { SectionHeading } from "./SectionHeading";
 export { SiteNav } from "./SiteNav";
 export { fieldClassName, labelClassName } from "./fieldStyles";

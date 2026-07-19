@@ -5,7 +5,7 @@ import { DinnerCard } from "./components/DinnerCard";
 import { LunchCard } from "./components/LunchCard";
 import { GrocerySummary } from "./components/GroceryListView";
 import { MiscGroceryAdd } from "./components/MiscGroceryAdd";
-import { Button, SectionHeading } from "./components/brand";
+import { Button, Panel, SectionHeading, panelClass } from "./components/brand";
 import type { ResolvedWeekPlan, Locks, WeekPreferences } from "@/lib/types";
 import type { GrocerySection } from "@/lib/groceryList";
 import {
@@ -278,7 +278,7 @@ export default function Home() {
 
       {confirmRegen && (
         <div
-          className="mb-8 border border-border bg-accent-soft p-4"
+          className={panelClass("accent", "mb-8")}
           role="alertdialog"
           aria-labelledby="regen-title"
           aria-describedby="regen-desc"
@@ -314,7 +314,7 @@ export default function Home() {
       )}
 
       {focusDinner && focus && (
-        <section className="mb-12 border-t border-border pt-6">
+        <Panel tone="accent" className="mb-12">
           <p className="text-[11px] font-bold uppercase tracking-[0.06em] text-accent-text">
             {focus.kind === "tonight"
               ? "Tonight"
@@ -329,7 +329,7 @@ export default function Home() {
           <p className="mt-2 text-sm text-meta">
             {focusDinner.cookMinutes} min · {focusDinner.protein}
           </p>
-        </section>
+        </Panel>
       )}
 
       <section className="mb-12">
@@ -375,13 +375,13 @@ export default function Home() {
         </div>
       </section>
 
-      <details className="mb-12 border-t border-border open:pb-2">
-        <summary className="cursor-pointer list-none py-4 marker:content-none [&::-webkit-details-marker]:hidden">
+      <details className={panelClass("neutral", "mb-12")}>
+        <summary className="cursor-pointer list-none marker:content-none [&::-webkit-details-marker]:hidden">
           <span className="inline-flex min-h-11 items-center font-serif text-xl font-semibold">
             Adjust this week
           </span>
         </summary>
-        <div className="space-y-4 pb-2">
+        <div className="space-y-4 pt-2">
           <p className="text-sm text-muted">
             Overrides settings defaults for the next regenerate.
           </p>
@@ -432,13 +432,13 @@ export default function Home() {
         <SectionHeading description="Checkoffs stay on this device. Extras you add are saved for the household this week.">
           Grocery
         </SectionHeading>
-        <div className="space-y-8">
+        <Panel tone="neutral" className="space-y-6">
           <GrocerySummary
             key={data.plan.weekOf}
             sections={data.groceryList}
             weekOf={data.plan.weekOf}
           />
-          <div className="border-t border-border pt-4">
+          <div className="border-t border-surface-border pt-6">
             <MiscGroceryAdd
               onUpdated={(payload) => {
                 setData((prev) =>
@@ -447,7 +447,7 @@ export default function Home() {
               }}
             />
           </div>
-        </div>
+        </Panel>
       </section>
     </main>
   );

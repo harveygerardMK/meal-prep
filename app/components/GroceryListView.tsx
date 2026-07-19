@@ -169,7 +169,7 @@ export function GrocerySummary({
   const remaining = Math.max(0, unchecked.length - preview.length);
 
   return (
-    <div className="border-t border-border pt-4">
+    <div>
       <p className="text-sm text-muted">
         {items.length} items · {unchecked.length} still to get
       </p>

@@ -7,6 +7,9 @@
   --meta: #757575;
   --border: #e5e5e5;
   --card: #ffffff;
+  /* Second neutral layer for utility/tool modules (adjust, grocery). */
+  --surface: #f6f5f4;
+  --surface-border: #e2e0dd;
   --accent: #e33d26;
   --accent-hover: #c73420;
   --accent-foreground: #ffffff;
@@ -27,6 +30,8 @@
   --color-meta: var(--meta);
   --color-border: var(--border);
   --color-card: var(--card);
+  --color-surface: var(--surface);
+  --color-surface-border: var(--surface-border);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-foreground: var(--accent-foreground);
