@@ -11,6 +11,7 @@ const dinner = (overrides: Partial<Dinner> & Pick<Dinner, "id">): Dinner => ({
   ingredients: [],
   effortScore: overrides.effortScore ?? 3,
   noveltyScore: overrides.noveltyScore ?? 3,
+  seasonCategory: overrides.seasonCategory,
 });
 
 describe("scoreDinnerCandidate", () => {
@@ -49,6 +50,16 @@ describe("scoreDinnerCandidate", () => {
     const easyFamiliar = { cookEffortTarget: 2, noveltyTarget: 1 };
     expect(scoreDinnerCandidate(quickFavorite, easyFamiliar, new Set())).toBeLessThan(
       scoreDinnerCandidate(longNew, easyFamiliar, new Set())
+    );
+  });
+
+  it("softly favors seasonal dinners when their other scores are equal", () => {
+    const soup = dinner({ id: "soup", seasonCategory: "soup" });
+    const grill = dinner({ id: "grill", seasonCategory: "grill" });
+    const prefs = { cookEffortTarget: 3, noveltyTarget: 3 };
+
+    expect(scoreDinnerCandidate(soup, prefs, new Set(), 10)).toBeLessThan(
+      scoreDinnerCandidate(grill, prefs, new Set(), 10)
     );
   });
 });

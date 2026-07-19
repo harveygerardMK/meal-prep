@@ -32,6 +32,10 @@ const planFixture = (): ResolvedWeekPlan => ({
 describe("groceryListFor", () => {
   beforeEach(() => {
     vi.mocked(getSettings).mockResolvedValue({
+      dinnersPerWeek: 5,
+      maxCookMinutes: 45,
+      noRepeatWeeks: 3,
+      servings: 4,
       cookEffortTarget: 3,
       noveltyTarget: 3,
       includeStaplesInGroceryList: true,
@@ -49,6 +53,10 @@ describe("groceryListFor", () => {
 
   it("omits staples when settings disable them", async () => {
     vi.mocked(getSettings).mockResolvedValue({
+      dinnersPerWeek: 5,
+      maxCookMinutes: 45,
+      noRepeatWeeks: 3,
+      servings: 4,
       cookEffortTarget: 3,
       noveltyTarget: 3,
       includeStaplesInGroceryList: false,

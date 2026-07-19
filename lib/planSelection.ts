@@ -17,11 +17,12 @@ export function shuffle<T>(arr: T[]): T[] {
 function rankDinners(
   dinners: Dinner[],
   preferences: WeekPreferences,
-  avoidIds: Set<string>
+  avoidIds: Set<string>,
+  monthIndex?: number
 ): Dinner[] {
   const scored = dinners.map((dinner) => ({
     dinner,
-    score: scoreDinnerCandidate(dinner, preferences, avoidIds),
+    score: scoreDinnerCandidate(dinner, preferences, avoidIds, monthIndex),
   }));
   scored.sort(
     (a, b) => a.score - b.score || a.dinner.id.localeCompare(b.dinner.id)
@@ -45,7 +46,8 @@ export function pickDinners(
   avoidIds: Set<string>,
   locked: (string | null)[],
   preferences: WeekPreferences = { cookEffortTarget: 3, noveltyTarget: 3 },
-  priorityIds: string[] = []
+  priorityIds: string[] = [],
+  monthIndex?: number
 ): string[] {
   const result: string[] = locked.slice(0, count).map((id) => id ?? "");
   while (result.length < count) result.push("");
@@ -79,12 +81,14 @@ export function pickDinners(
   const fresh = rankDinners(
     withinTime.filter((d) => !avoidIds.has(d.id) && !usedIds.has(d.id)),
     preferences,
-    avoidIds
+    avoidIds,
+    monthIndex
   );
   const fallback = rankDinners(
     withinTime.filter((d) => !usedIds.has(d.id)),
     preferences,
-    avoidIds
+    avoidIds,
+    monthIndex
   );
 
   for (let i = 0; i < count; i++) {

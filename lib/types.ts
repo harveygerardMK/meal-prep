@@ -1,5 +1,6 @@
 export type RecipeStatus = "draft" | "active" | "archived";
 export type MealKind = "dinner" | "girl_lunch" | "boy_lunch";
+export type SeasonCategory = "soup" | "grill" | "tacos" | "pasta";
 
 export type RecipeSource = {
   type: "manual" | "tiktok" | "other";
@@ -19,6 +20,7 @@ export type CatalogRecipe = {
   favorite: boolean;
   effortScore: number;
   noveltyScore: number;
+  seasonCategory?: SeasonCategory | "none";
   source?: RecipeSource;
 };
 
@@ -33,6 +35,7 @@ export type Dinner = {
   favorite?: boolean;
   effortScore?: number;
   noveltyScore?: number;
+  seasonCategory?: SeasonCategory | "none";
   instructions?: string[];
   source?: RecipeSource;
 };

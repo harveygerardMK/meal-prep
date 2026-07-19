@@ -127,6 +127,8 @@ async function buildPlan(
   }
 
   const queued = await listPendingForWeek(weekOf);
+  // Week dates are interpreted at local noon, matching the household's local calendar.
+  const monthIndex = new Date(`${weekOf}T12:00:00`).getMonth();
   const dinnerIds = pickDinners(
     recipes.dinners,
     settings.dinnersPerWeek,
@@ -134,7 +136,8 @@ async function buildPlan(
     avoidDinners,
     locks.dinners,
     preferences,
-    queued.map((item) => item.recipeId)
+    queued.map((item) => item.recipeId),
+    monthIndex
   );
   // A locked slot whose id still matches this week's existing custom slot keeps its
   // full custom data (name/ingredients/etc.); everything else resolves as a recipe id.

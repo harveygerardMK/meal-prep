@@ -1,4 +1,5 @@
 import type { Dinner, WeekPreferences } from "@/lib/types";
+import { seasonScoreAdjustment } from "./seasonality";
 
 /** Infer effort 1–5 from cook time and tags when catalog scores are flat. */
 export function inferEffortScore(dinner: Pick<Dinner, "cookMinutes" | "tags">): number {
@@ -40,12 +41,15 @@ function effectiveNovelty(dinner: Dinner): number {
 export function scoreDinnerCandidate(
   dinner: Dinner,
   preferences: WeekPreferences,
-  avoidIds: Set<string>
+  avoidIds: Set<string>,
+  monthIndex?: number
 ): number {
   const effort = effectiveEffort(dinner);
   const novelty = effectiveNovelty(dinner);
   const effortDistance = Math.abs(effort - preferences.cookEffortTarget);
   const noveltyDistance = Math.abs(novelty - preferences.noveltyTarget);
   const recentPenalty = avoidIds.has(dinner.id) ? 2.5 : 0;
-  return effortDistance + noveltyDistance + recentPenalty;
+  const seasonalAdjustment =
+    monthIndex === undefined ? 0 : seasonScoreAdjustment(dinner.seasonCategory, monthIndex);
+  return effortDistance + noveltyDistance + recentPenalty + seasonalAdjustment;
 }

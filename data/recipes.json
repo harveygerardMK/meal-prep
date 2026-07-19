@@ -15,6 +15,7 @@
       "protein": "beef",
       "cookMinutes": 25,
       "tags": ["favorite", "weeknight"],
+      "seasonCategory": "tacos",
       "ingredients": ["1 lb ground beef", "Taco seasoning", "8 small tortillas", "1 cup shredded cheese", "1 cup shredded lettuce", "1/2 cup salsa", "Sour cream"]
     },
     {
@@ -39,6 +40,7 @@
       "protein": "vegetarian",
       "cookMinutes": 20,
       "tags": ["favorite", "quick", "vegetarian"],
+      "seasonCategory": "pasta",
       "ingredients": ["1 lb spaghetti", "1 1/2 cups grated pecorino romano", "2 tsp coarse black pepper", "4 tbsp butter"]
     },
     {
@@ -63,6 +65,7 @@
       "protein": "pork",
       "cookMinutes": 35,
       "tags": ["favorite", "soup"],
+      "seasonCategory": "soup",
       "ingredients": ["1 lb ground pork meatballs", "1 can coconut milk", "2 tbsp red curry paste", "4 oz rice noodles", "1 cup baby spinach", "Juice of 1 lime", "Cilantro"]
     },
     {
@@ -79,6 +82,7 @@
       "protein": "chicken",
       "cookMinutes": 35,
       "tags": ["favorite", "soup", "cold-weather"],
+      "seasonCategory": "soup",
       "ingredients": ["1 lb chicken breast", "8 cups chicken stock", "2 carrots, sliced", "2 stalks celery, sliced", "6 oz egg noodles"]
     },
     {
@@ -87,6 +91,7 @@
       "protein": "beef",
       "cookMinutes": 75,
       "tags": ["favorite", "weekend", "make-ahead"],
+      "seasonCategory": "pasta",
       "ingredients": ["1 lb ground beef", "1 box lasagna noodles", "15 oz ricotta", "3 cups shredded mozzarella", "24 oz marinara sauce", "1 egg"]
     },
     {
@@ -103,6 +108,7 @@
       "protein": "beef",
       "cookMinutes": 30,
       "tags": ["favorite", "grill"],
+      "seasonCategory": "grill",
       "ingredients": ["1.5 lb flank steak", "Juice of 3 limes", "1/4 cup cilantro, chopped", "3 cloves garlic, minced", "8 small tortillas"]
     },
     {
@@ -159,6 +165,7 @@
       "protein": "beef",
       "cookMinutes": 35,
       "tags": ["favorite"],
+      "seasonCategory": "grill",
       "ingredients": ["1.5 lb flank or ribeye steak", "1.5 lb baby potatoes", "2 cups arugula", "Olive oil", "Balsamic glaze"]
     },
     {
@@ -167,6 +174,7 @@
       "protein": "pork",
       "cookMinutes": 30,
       "tags": ["favorite"],
+      "seasonCategory": "pasta",
       "ingredients": ["1 lb potato gnocchi", "1 lb italian sausage links, sliced", "2 bell peppers, sliced", "1/2 onion, sliced", "2 tbsp olive oil"]
     },
     {
@@ -183,6 +191,7 @@
       "protein": "vegetarian",
       "cookMinutes": 35,
       "tags": ["favorite", "soup", "cold-weather"],
+      "seasonCategory": "soup",
       "ingredients": ["4 cups corn kernels", "2 potatoes, diced", "4 slices bacon", "1 cup heavy cream", "4 cups vegetable stock", "Tortillas for serving"]
     },
     {
@@ -191,6 +200,7 @@
       "protein": "vegetarian",
       "cookMinutes": 60,
       "tags": ["favorite", "soup", "weekend"],
+      "seasonCategory": "soup",
       "ingredients": ["4 large onions, sliced", "6 cups beef broth", "1 baguette, sliced", "2 cups gruyere, shredded", "Fresh thyme"]
     },
     {
@@ -215,6 +225,7 @@
       "protein": "beef",
       "cookMinutes": 30,
       "tags": ["favorite", "kid-friendly"],
+      "seasonCategory": "pasta",
       "ingredients": ["1 lb spaghetti", "1 lb ground beef", "24 oz marinara sauce", "1 loaf garlic bread", "Parmesan"]
     },
     {
@@ -223,6 +234,7 @@
       "protein": "beef",
       "cookMinutes": 25,
       "tags": ["favorite", "quick"],
+      "seasonCategory": "grill",
       "ingredients": ["1.5 lb flank steak", "1 bunch asparagus", "Olive oil", "Garlic powder"]
     },
     {
@@ -231,6 +243,7 @@
       "protein": "chicken",
       "cookMinutes": 30,
       "tags": ["favorite", "customizable"],
+      "seasonCategory": "grill",
       "ingredients": ["1.5 lb chicken breast or steak, sliced", "2 bell peppers, sliced", "1 onion, sliced", "8 tortillas", "2 avocados", "Fajita seasoning"]
     },
     {
@@ -247,6 +260,7 @@
       "protein": "vegetarian",
       "cookMinutes": 25,
       "tags": ["favorite", "vegetarian"],
+      "seasonCategory": "pasta",
       "ingredients": ["1 lb short pasta", "2 cups full-fat greek yogurt", "4 tbsp butter", "2 tbsp aleppo pepper or paprika", "4 cloves garlic"]
     },
     {
@@ -263,6 +277,7 @@
       "protein": "fish",
       "cookMinutes": 20,
       "tags": ["fish", "quick", "add-more-variety"],
+      "seasonCategory": "pasta",
       "ingredients": ["1 lb linguine", "1.5 lb shrimp, peeled", "5 cloves garlic, minced", "4 tbsp butter", "1/2 cup white wine", "Lemon", "Parsley"]
     },
     {
@@ -279,6 +294,7 @@
       "protein": "vegetarian",
       "cookMinutes": 25,
       "tags": ["favorite", "soup"],
+      "seasonCategory": "soup",
       "effortScore": 2,
       "noveltyScore": 1,
       "ingredients": ["8 slices sandwich bread", "1 lb sliced cheddar", "4 tbsp butter", "2 cans tomato soup", "1/2 cup heavy cream"]
@@ -289,6 +305,7 @@
       "protein": "vegetarian",
       "cookMinutes": 25,
       "tags": ["favorite", "pasta"],
+      "seasonCategory": "pasta",
       "effortScore": 2,
       "noveltyScore": 1,
       "ingredients": ["1 lb potato gnocchi", "4 cups arugula", "1/2 cup feta, crumbled", "1 lemon, juiced", "2 tbsp olive oil"]
@@ -299,6 +316,7 @@
       "protein": "pork",
       "cookMinutes": 35,
       "tags": ["favorite", "soup"],
+      "seasonCategory": "soup",
       "effortScore": 3,
       "noveltyScore": 2,
       "ingredients": ["1 lb potato gnocchi", "6 cups broth", "2 cups kale or spinach", "1 lb italian sausage", "1/2 cup parmesan"]
@@ -309,6 +327,7 @@
       "protein": "pork",
       "cookMinutes": 35,
       "tags": ["favorite", "soup"],
+      "seasonCategory": "soup",
       "effortScore": 3,
       "noveltyScore": 2,
       "ingredients": ["1 lb kielbasa, sliced", "1 lb potatoes, diced", "2 cups cabbage or kale, chopped", "6 cups chicken broth", "1 tsp smoked paprika"]
@@ -319,6 +338,7 @@
       "protein": "chicken",
       "cookMinutes": 35,
       "tags": ["favorite", "pasta"],
+      "seasonCategory": "pasta",
       "effortScore": 3,
       "noveltyScore": 2,
       "ingredients": ["1 lb chicken breast, cubed", "1 lb orzo", "2 lemons, juiced", "4 tbsp butter", "1/2 cup parmesan", "2 cups spinach"]
@@ -349,6 +369,7 @@
       "protein": "pork",
       "cookMinutes": 30,
       "tags": ["favorite", "grill"],
+      "seasonCategory": "grill",
       "effortScore": 2,
       "noveltyScore": 1,
       "ingredients": ["4 bratwurst links", "4 buns", "4 ears corn on the cob", "4 tbsp butter"]
@@ -369,6 +390,7 @@
       "protein": "beef",
       "cookMinutes": 30,
       "tags": ["favorite", "tacos"],
+      "seasonCategory": "tacos",
       "effortScore": 2,
       "noveltyScore": 2,
       "ingredients": ["24 wonton or tortilla cups", "1 lb ground beef", "1 packet taco seasoning", "1 cup shredded cheese", "1 cup salsa"]

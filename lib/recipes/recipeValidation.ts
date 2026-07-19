@@ -5,11 +5,19 @@ import type {
   MealKind,
   RecipeData,
   RecipeSource,
+  SeasonCategory,
   RecipeStatus,
 } from "@/lib/types";
 
 const STATUSES: RecipeStatus[] = ["draft", "active", "archived"];
 const KINDS: MealKind[] = ["dinner", "girl_lunch", "boy_lunch"];
+const SEASON_CATEGORIES: (SeasonCategory | "none")[] = [
+  "soup",
+  "grill",
+  "tacos",
+  "pasta",
+  "none",
+];
 
 function requireString(value: unknown, field: string): string {
   if (typeof value !== "string" || value.trim().length === 0) {
@@ -47,6 +55,17 @@ function parseKind(value: unknown): MealKind {
     throw new Error(`Invalid kind: expected dinner, girl_lunch, or boy_lunch`);
   }
   return value as MealKind;
+}
+
+function parseSeasonCategory(value: unknown): SeasonCategory | "none" | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (
+    typeof value !== "string" ||
+    !SEASON_CATEGORIES.includes(value as SeasonCategory | "none")
+  ) {
+    throw new Error("Invalid seasonCategory: expected soup, grill, tacos, pasta, or none");
+  }
+  return value as SeasonCategory | "none";
 }
 
 function parseSource(value: unknown): RecipeSource | undefined {
@@ -91,6 +110,7 @@ export function parseCatalogRecipeInput(
     favorite: Boolean(body.favorite),
     effortScore: requireScore(body.effortScore, "effortScore", 3),
     noveltyScore: requireScore(body.noveltyScore, "noveltyScore", 3),
+    seasonCategory: parseSeasonCategory(body.seasonCategory),
     source: parseSource(body.source) ?? { type: "manual" },
   };
 
@@ -133,6 +153,7 @@ function toDinner(recipe: CatalogRecipe): Dinner {
     favorite: recipe.favorite,
     effortScore: recipe.effortScore,
     noveltyScore: recipe.noveltyScore,
+    seasonCategory: recipe.seasonCategory,
     instructions: recipe.instructions,
     source: recipe.source,
   };
