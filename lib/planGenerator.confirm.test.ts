@@ -20,6 +20,15 @@ vi.mock("./repositories/queueRepository", () => ({
   markQueueConsumed: vi.fn(),
 }));
 
+vi.mock("./repositories/wildcardStateRepository", () => ({
+  getWildcardState: vi.fn(),
+  saveWildcardState: vi.fn(),
+}));
+
+vi.mock("./repositories/recipeRepository", () => ({
+  saveCatalogRecipe: vi.fn(),
+}));
+
 import {
   getHistory,
   getRecipes,
@@ -30,6 +39,7 @@ import {
 } from "./dataStore";
 import { confirmCurrentPlan, regenerateCurrentPlan } from "./planGenerator";
 import { listPendingForWeek } from "./repositories/queueRepository";
+import { getWildcardState } from "./repositories/wildcardStateRepository";
 
 const settings: Settings = {
   dinnersPerWeek: 1,
@@ -117,6 +127,7 @@ describe("confirmCurrentPlan", () => {
     vi.mocked(getRecipes).mockResolvedValue(recipes);
     vi.mocked(getHistory).mockResolvedValue({ weeks: [plan] });
     vi.mocked(listPendingForWeek).mockResolvedValue([]);
+    vi.mocked(getWildcardState).mockResolvedValue({ lastWildcardMonth: null });
   });
 
   afterEach(() => {

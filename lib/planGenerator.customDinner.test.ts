@@ -15,6 +15,15 @@ vi.mock("./repositories/queueRepository", () => ({
   markQueueConsumed: vi.fn(),
 }));
 
+vi.mock("./repositories/wildcardStateRepository", () => ({
+  getWildcardState: vi.fn(),
+  saveWildcardState: vi.fn(),
+}));
+
+vi.mock("./repositories/recipeRepository", () => ({
+  saveCatalogRecipe: vi.fn(),
+}));
+
 import {
   getHistory,
   getRecipes,
@@ -29,6 +38,7 @@ import {
   setCustomDinnerForCurrentWeek,
 } from "./planGenerator";
 import { listPendingForWeek } from "./repositories/queueRepository";
+import { getWildcardState } from "./repositories/wildcardStateRepository";
 
 const settings: Settings = {
   dinnersPerWeek: 2,
@@ -154,6 +164,7 @@ describe("setCustomDinnerForCurrentWeek", () => {
     vi.mocked(getRecipes).mockResolvedValue(recipes);
     vi.mocked(getHistory).mockResolvedValue({ weeks: [currentPlan] });
     vi.mocked(listPendingForWeek).mockResolvedValue([]);
+    vi.mocked(getWildcardState).mockResolvedValue({ lastWildcardMonth: null });
   });
 
   afterEach(() => {
@@ -244,6 +255,7 @@ describe("custom dinner locks survive regenerate", () => {
     vi.mocked(getRecipes).mockResolvedValue(recipes);
     vi.mocked(getHistory).mockResolvedValue({ weeks: [planWithCustom] });
     vi.mocked(listPendingForWeek).mockResolvedValue([]);
+    vi.mocked(getWildcardState).mockResolvedValue({ lastWildcardMonth: null });
     vi.mocked(upsertWeekPlan).mockImplementation(async (plan) => ({ weeks: [plan] }));
   });
 

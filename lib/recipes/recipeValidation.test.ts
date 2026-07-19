@@ -18,6 +18,19 @@ describe("parseCatalogRecipeInput", () => {
     expect(recipe.noveltyScore).toBe(3);
   });
 
+  it("preserves the optional wildcard flag for an untried dinner", () => {
+    const recipe = parseCatalogRecipeInput({
+      id: "new-dinner",
+      kind: "dinner",
+      name: "New dinner",
+      protein: "chicken",
+      cookMinutes: 25,
+      wildcard: true,
+    });
+
+    expect(recipe.wildcard).toBe(true);
+  });
+
   it("rejects archived hard-delete attempts by requiring status archive instead", () => {
     expect(() =>
       parseCatalogRecipeInput({
@@ -67,5 +80,30 @@ describe("recipeToPlannerViews", () => {
     ];
     const views = recipeToPlannerViews(recipes, 4);
     expect(views.dinners.map((d) => d.id)).toEqual(["tacos"]);
+  });
+
+  it("keeps the wildcard flag in the dinner planner view", () => {
+    const views = recipeToPlannerViews(
+      [
+        {
+          id: "new-dinner",
+          kind: "dinner",
+          name: "New dinner",
+          protein: "chicken",
+          cookMinutes: 25,
+          tags: [],
+          ingredients: [],
+          instructions: [],
+          status: "active",
+          favorite: false,
+          wildcard: true,
+          effortScore: 3,
+          noveltyScore: 3,
+        },
+      ],
+      4
+    );
+
+    expect(views.dinners[0].wildcard).toBe(true);
   });
 });

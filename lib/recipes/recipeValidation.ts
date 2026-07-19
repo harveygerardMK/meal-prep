@@ -50,6 +50,14 @@ function parseStatus(value: unknown): RecipeStatus {
   return value as RecipeStatus;
 }
 
+function parseOptionalBoolean(value: unknown, field: string): boolean | undefined {
+  if (value === undefined || value === null) return undefined;
+  if (typeof value !== "boolean") {
+    throw new Error(`Invalid ${field}: expected a boolean`);
+  }
+  return value;
+}
+
 function parseKind(value: unknown): MealKind {
   if (typeof value !== "string" || !KINDS.includes(value as MealKind)) {
     throw new Error(`Invalid kind: expected dinner, girl_lunch, or boy_lunch`);
@@ -110,6 +118,7 @@ export function parseCatalogRecipeInput(
     favorite: Boolean(body.favorite),
     effortScore: requireScore(body.effortScore, "effortScore", 3),
     noveltyScore: requireScore(body.noveltyScore, "noveltyScore", 3),
+    wildcard: parseOptionalBoolean(body.wildcard, "wildcard"),
     seasonCategory: parseSeasonCategory(body.seasonCategory),
     source: parseSource(body.source) ?? { type: "manual" },
   };
@@ -153,6 +162,7 @@ function toDinner(recipe: CatalogRecipe): Dinner {
     favorite: recipe.favorite,
     effortScore: recipe.effortScore,
     noveltyScore: recipe.noveltyScore,
+    wildcard: recipe.wildcard,
     seasonCategory: recipe.seasonCategory,
     instructions: recipe.instructions,
     source: recipe.source,

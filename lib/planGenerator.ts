@@ -11,10 +11,16 @@ import { customDinnerToDinner, dinnerSlotId } from "./dinnerSlot";
 import { weekStartISO } from "./week";
 import { pickDinners, pickLunch } from "./planSelection";
 import { recipeToPlannerViews } from "./recipes/recipeValidation";
+import { planMonthlyWildcard } from "./planning/wildcard";
 import {
   listPendingForWeek,
   markQueueConsumed,
 } from "./repositories/queueRepository";
+import {
+  getWildcardState,
+  saveWildcardState,
+} from "./repositories/wildcardStateRepository";
+import { saveCatalogRecipe } from "./repositories/recipeRepository";
 import type {
   CustomDinner,
   CustomDinnerInput,
@@ -98,16 +104,46 @@ function emptyLocks(dinnersPerWeek: number): Locks {
   };
 }
 
+function firstSlotAfterQueue(
+  dinners: { id: string; cookMinutes: number }[],
+  count: number,
+  maxCookMinutes: number,
+  locks: (string | null)[],
+  queuedRecipeIds: string[]
+): number | null {
+  const slotIds = locks.slice(0, count).map((id) => id ?? "");
+  while (slotIds.length < count) slotIds.push("");
+
+  const usedIds = new Set(
+    slotIds.filter((id) => dinners.some((dinner) => dinner.id === id))
+  );
+  for (const recipeId of queuedRecipeIds) {
+    const emptyIndex = slotIds.findIndex((id) => !id);
+    if (emptyIndex < 0 || usedIds.has(recipeId)) continue;
+    const queuedDinner = dinners.find(
+      (dinner) => dinner.id === recipeId && dinner.cookMinutes <= maxCookMinutes
+    );
+    if (!queuedDinner) continue;
+    slotIds[emptyIndex] = queuedDinner.id;
+    usedIds.add(queuedDinner.id);
+  }
+
+  const emptyIndex = slotIds.findIndex((id) => !id);
+  return emptyIndex >= 0 ? emptyIndex : null;
+}
+
 async function buildPlan(
   weekOf: string,
   locks: Locks,
   preferences: WeekPreferences,
   opts?: { avoidCurrentUnlocked?: boolean }
 ): Promise<WeekPlan> {
-  const [recipes, settings, history] = await Promise.all([
+  const [recipes, settings, history, catalog, wildcardState] = await Promise.all([
     getRecipes(),
     getSettings(),
     getHistory(),
+    listCatalogRecipes(),
+    getWildcardState(),
   ]);
 
   const avoidDinners = recentDinnerIds(history, weekOf, settings.noRepeatWeeks);
@@ -127,6 +163,26 @@ async function buildPlan(
   }
 
   const queued = await listPendingForWeek(weekOf);
+  const queuedRecipeIds = queued.map((item) => item.recipeId);
+  const wildcard = planMonthlyWildcard({
+    month: weekOf.slice(0, 7),
+    state: wildcardState,
+    candidates: catalog,
+    // Queue picks have priority. Only inject the wildcard into a slot left
+    // empty by that pass, so a full queue skips the wildcard for this month.
+    slotIndex: firstSlotAfterQueue(
+      recipes.dinners,
+      settings.dinnersPerWeek,
+      settings.maxCookMinutes,
+      locks.dinners,
+      queuedRecipeIds
+    ),
+  });
+  const dinnerLocks = [...locks.dinners];
+  if (wildcard.recipeId !== undefined && wildcard.slotIndex !== undefined) {
+    dinnerLocks[wildcard.slotIndex] = wildcard.recipeId;
+  }
+
   // Week dates are interpreted at local noon, matching the household's local calendar.
   const monthIndex = new Date(`${weekOf}T12:00:00`).getMonth();
   const dinnerIds = pickDinners(
@@ -134,9 +190,9 @@ async function buildPlan(
     settings.dinnersPerWeek,
     settings.maxCookMinutes,
     avoidDinners,
-    locks.dinners,
+    dinnerLocks,
     preferences,
-    queued.map((item) => item.recipeId),
+    queuedRecipeIds,
     monthIndex
   );
   // A locked slot whose id still matches this week's existing custom slot keeps its
@@ -162,6 +218,15 @@ async function buildPlan(
     miscGrocery: existingWeek?.miscGrocery ?? [],
   });
   await upsertWeekPlan(plan);
+  if (wildcardState.lastWildcardMonth !== wildcard.nextState.lastWildcardMonth) {
+    await saveWildcardState(wildcard.nextState);
+  }
+  if (wildcard.recipeId) {
+    const recipe = catalog.find((item) => item.id === wildcard.recipeId);
+    if (recipe) {
+      await saveCatalogRecipe({ ...recipe, wildcard: false });
+    }
+  }
   const consumed = queued
     .filter((item) => dinnerIds.includes(item.recipeId))
     .map((item) => item.id);

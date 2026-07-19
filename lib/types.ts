@@ -20,6 +20,8 @@ export type CatalogRecipe = {
   favorite: boolean;
   effortScore: number;
   noveltyScore: number;
+  /** Eligible for the once-per-calendar-month untried dinner draw. */
+  wildcard?: boolean;
   seasonCategory?: SeasonCategory | "none";
   source?: RecipeSource;
 };
@@ -35,6 +37,7 @@ export type Dinner = {
   favorite?: boolean;
   effortScore?: number;
   noveltyScore?: number;
+  wildcard?: boolean;
   seasonCategory?: SeasonCategory | "none";
   instructions?: string[];
   source?: RecipeSource;

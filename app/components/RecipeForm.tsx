@@ -23,6 +23,7 @@ export function RecipeForm({ initial, onSaved }: Props) {
     favorite: initial?.favorite ?? false,
     effortScore: initial?.effortScore ?? 3,
     noveltyScore: initial?.noveltyScore ?? 3,
+    wildcard: initial?.wildcard ?? false,
   });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,6 +52,7 @@ export function RecipeForm({ initial, onSaved }: Props) {
         .filter(Boolean),
       status: form.status,
       favorite: form.favorite,
+      wildcard: form.wildcard,
       effortScore: Number(form.effortScore),
       noveltyScore: Number(form.noveltyScore),
       source: initial?.source ?? { type: "manual" as const },
@@ -104,34 +106,45 @@ export function RecipeForm({ initial, onSaved }: Props) {
       </div>
 
       {form.kind === "dinner" && (
-        <div className="grid gap-5 sm:grid-cols-2">
-          <div>
-            <label htmlFor="protein" className={labelClassName}>
-              Protein
-            </label>
-            <input
-              id="protein"
-              required
-              value={form.protein}
-              onChange={(e) => setForm({ ...form, protein: e.target.value })}
-              className={fieldClassName}
-            />
+        <>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div>
+              <label htmlFor="protein" className={labelClassName}>
+                Protein
+              </label>
+              <input
+                id="protein"
+                required
+                value={form.protein}
+                onChange={(e) => setForm({ ...form, protein: e.target.value })}
+                className={fieldClassName}
+              />
+            </div>
+            <div>
+              <label htmlFor="cookMinutes" className={labelClassName}>
+                Cook minutes
+              </label>
+              <input
+                id="cookMinutes"
+                type="number"
+                min={1}
+                required
+                value={form.cookMinutes}
+                onChange={(e) => setForm({ ...form, cookMinutes: Number(e.target.value) })}
+                className={fieldClassName}
+              />
+            </div>
           </div>
-          <div>
-            <label htmlFor="cookMinutes" className={labelClassName}>
-              Cook minutes
-            </label>
+          <label className="flex items-center gap-2 text-sm font-medium">
             <input
-              id="cookMinutes"
-              type="number"
-              min={1}
-              required
-              value={form.cookMinutes}
-              onChange={(e) => setForm({ ...form, cookMinutes: Number(e.target.value) })}
-              className={fieldClassName}
+              type="checkbox"
+              checked={form.wildcard}
+              onChange={(e) => setForm({ ...form, wildcard: e.target.checked })}
+              className="accent-[var(--accent)]"
             />
-          </div>
-        </div>
+            Wildcard / untried
+          </label>
+        </>
       )}
 
       <div className="grid gap-5 sm:grid-cols-2">
