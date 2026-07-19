@@ -1,4 +1,5 @@
 import type {
+  CustomDinnerInput,
   GrocerySectionName,
   Locks,
   Settings,
@@ -121,6 +122,45 @@ export function parseWeekPreferences(
       "noveltyTarget",
       fallback.noveltyTarget
     ),
+  };
+}
+
+function requireIndex(value: unknown, field: string): number {
+  if (typeof value !== "number" || !Number.isInteger(value) || value < 0) {
+    throw new Error(`Invalid ${field}: expected a non-negative integer`);
+  }
+  return value;
+}
+
+function requireIngredientList(value: unknown, field: string): string[] {
+  if (value === undefined || value === null) return [];
+  if (!Array.isArray(value) || value.some((v) => typeof v !== "string")) {
+    throw new Error(`Invalid ${field}: expected an array of strings`);
+  }
+  return value.map((v) => v.trim()).filter((v) => v.length > 0);
+}
+
+function requireOptionalPositiveInt(value: unknown, field: string): number | undefined {
+  if (value === undefined || value === null) return undefined;
+  return requirePositiveInt(value, field);
+}
+
+function requireOptionalString(value: unknown, field: string): string | undefined {
+  if (value === undefined || value === null || value === "") return undefined;
+  return requireString(value, field);
+}
+
+export function parseCustomDinnerInput(input: unknown): CustomDinnerInput {
+  if (!input || typeof input !== "object") {
+    throw new Error("Invalid custom dinner: expected an object");
+  }
+  const body = input as Record<string, unknown>;
+  return {
+    index: requireIndex(body.index, "index"),
+    name: requireString(body.name, "name"),
+    ingredients: requireIngredientList(body.ingredients, "ingredients"),
+    cookMinutes: requireOptionalPositiveInt(body.cookMinutes, "cookMinutes"),
+    protein: requireOptionalString(body.protein, "protein"),
   };
 }
 

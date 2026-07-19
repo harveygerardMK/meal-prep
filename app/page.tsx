@@ -144,6 +144,40 @@ export default function Home() {
     }
   }
 
+  async function saveCustomDinner(
+    index: number,
+    input: { name: string; ingredients: string[] }
+  ) {
+    setBusy(true);
+    setError(null);
+    setStatus(null);
+    try {
+      const res = await fetch("/api/plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "setCustomDinner", index, ...input }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error(json.error || "Failed to save custom dinner");
+      }
+      const next = json as PlanResponse;
+      setData(next);
+      setLockedDinners(next.plan.locks.dinners.map((id: string | null) => id !== null));
+      setLockedGirl(next.plan.locks.girlLunch !== null);
+      setLockedBoy(next.plan.locks.boyLunch !== null);
+      setPreferences(next.plan.preferences);
+      setStatus("Custom dinner saved and locked.");
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to save custom dinner";
+      setError(message);
+      throw err instanceof Error ? err : new Error(message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function confirmPlan() {
     setBusy(true);
     setError(null);
@@ -308,6 +342,7 @@ export default function Home() {
               dayLabel={weekdayShort(dinnerSlotDate(data.plan.weekOf, i))}
               locked={lockedDinners[i] ?? false}
               emphasized={focus?.index === i}
+              onSaveCustomDinner={(input) => saveCustomDinner(i, input)}
               onToggleLock={() =>
                 setLockedDinners((prev) => {
                   const next = [...prev];

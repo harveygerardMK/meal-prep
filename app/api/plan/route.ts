@@ -4,9 +4,14 @@ import {
   getCurrentPlan,
   PlanNotFoundError,
   regenerateCurrentPlan,
+  setCustomDinnerForCurrentWeek,
 } from "@/lib/planGenerator";
 import { groceryListFor } from "@/lib/groceryListFor.server";
-import { parseLocks, parseWeekPreferences } from "@/lib/validation";
+import {
+  parseCustomDinnerInput,
+  parseLocks,
+  parseWeekPreferences,
+} from "@/lib/validation";
 import { getSettings } from "@/lib/dataStore";
 
 function errorResponse(error: unknown, fallbackStatus = 500) {
@@ -32,7 +37,21 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const action = body?.action === "ensure" ? "ensure" : "regenerate";
+    const action =
+      body?.action === "ensure"
+        ? "ensure"
+        : body?.action === "setCustomDinner"
+          ? "setCustomDinner"
+          : "regenerate";
+
+    if (action === "setCustomDinner") {
+      const plan = await setCustomDinnerForCurrentWeek(
+        parseCustomDinnerInput(body)
+      );
+      const groceryList = await groceryListFor(plan);
+      return NextResponse.json({ plan, groceryList });
+    }
+
     const settings = await getSettings();
     const preferences = parseWeekPreferences(body?.preferences, {
       cookEffortTarget: settings.cookEffortTarget,

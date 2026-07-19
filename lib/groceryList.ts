@@ -41,7 +41,7 @@ const SECTION_KEYWORDS: [string, RegExp][] = [
   ["Frozen", /\b(frozen|tots|nuggets)\b/i],
   [
     "Produce",
-    /\b(onion|garlic|pepper|potato|potatoes|carrot|celery|broccoli|asparagus|lettuce|romaine|spinach|arugula|cucumber|tomato|tomatoes|avocado|lime|lemon|cilantro|parsley|scallion|ginger|thyme|rosemary|dill|apple|grape|grapes|corn|green beans)\b/i,
+    /\b(onion|garlic|pepper|potato|potatoes|carrots?|celery|broccoli|asparagus|lettuce|romaine|spinach|arugula|cucumber|tomato|tomatoes|avocado|lime|lemon|cilantro|parsley|scallion|ginger|thyme|rosemary|dill|apple|grape|grapes|corn|green beans)\b/i,
   ],
   [
     "Pantry & Dry Goods",

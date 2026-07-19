@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseLocks, parseSettings } from "./validation";
+import { parseCustomDinnerInput, parseLocks, parseSettings } from "./validation";
 
 describe("parseSettings", () => {
   it("accepts valid settings", () => {
@@ -76,5 +76,49 @@ describe("parseLocks", () => {
         boyLunch: null,
       })
     ).toThrow(/dinner lock/i);
+  });
+});
+
+describe("parseCustomDinnerInput", () => {
+  it("accepts a minimal custom dinner with no ingredients", () => {
+    expect(parseCustomDinnerInput({ index: 0, name: "Leftovers" })).toEqual({
+      index: 0,
+      name: "Leftovers",
+      ingredients: [],
+      cookMinutes: undefined,
+      protein: undefined,
+    });
+  });
+
+  it("accepts a full custom dinner", () => {
+    expect(
+      parseCustomDinnerInput({
+        index: 2,
+        name: "Grandma's stew",
+        ingredients: ["beef", "carrots", ""],
+        cookMinutes: 45,
+        protein: "beef",
+      })
+    ).toEqual({
+      index: 2,
+      name: "Grandma's stew",
+      ingredients: ["beef", "carrots"],
+      cookMinutes: 45,
+      protein: "beef",
+    });
+  });
+
+  it("rejects a negative index", () => {
+    expect(() => parseCustomDinnerInput({ index: -1, name: "X" })).toThrow(/index/i);
+  });
+
+  it("rejects a missing name", () => {
+    expect(() => parseCustomDinnerInput({ index: 0 })).toThrow(/name/i);
+  });
+
+  it("rejects non-string ingredients", () => {
+    expect(() =>
+      parseCustomDinnerInput({ index: 0, name: "X", ingredients: [1, 2] })
+    ).toThrow(/ingredients/i);
   });
 });

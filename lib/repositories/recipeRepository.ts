@@ -81,7 +81,7 @@ export async function isRecipeReferencedInHistory(id: string): Promise<boolean> 
   const history = await getHistory();
   return history.weeks.some(
     (week) =>
-      week.dinners.includes(id) ||
+      week.dinners.some((slot) => slot.type === "recipe" && slot.recipeId === id) ||
       week.girlLunch === id ||
       week.boyLunch === id
   );

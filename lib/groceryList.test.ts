@@ -124,6 +124,46 @@ describe("buildGroceryList", () => {
     );
   });
 
+  it("includes a custom dinner's ingredients when present", () => {
+    const sections = buildGroceryList(
+      planFixture({
+        dinners: [
+          {
+            id: "custom:abc",
+            name: "Grandma's stew",
+            protein: "beef",
+            cookMinutes: 45,
+            tags: ["custom"],
+            ingredients: ["1 lb beef stew meat", "1 onion"],
+          },
+        ],
+      })
+    );
+    const allEntries = sections.flatMap((s) => s.items.flatMap((i) => i.entries));
+    expect(allEntries.some((e) => e.source === "Grandma's stew")).toBe(true);
+    const produce = sections.find((s) => s.section === "Produce");
+    expect(produce?.items.some((i) => i.name.toLowerCase().includes("onion"))).toBe(true);
+  });
+
+  it("contributes nothing for a custom dinner with empty ingredients, like leftovers", () => {
+    const withCustom = buildGroceryList(
+      planFixture({
+        dinners: [
+          {
+            id: "custom:abc",
+            name: "Leftovers",
+            protein: "varies",
+            cookMinutes: 0,
+            tags: ["custom"],
+            ingredients: [],
+          },
+        ],
+      })
+    );
+    const withoutDinner = buildGroceryList(planFixture({ dinners: [] }));
+    expect(withCustom).toEqual(withoutDinner);
+  });
+
   it("uses a staple's explicit section when it merges with an ingredient", () => {
     const sections = buildGroceryList(
       planFixture({

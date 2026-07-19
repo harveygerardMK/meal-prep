@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import {
   getRecipes,
   getSettings,
@@ -6,6 +7,7 @@ import {
   getWeekPlan,
   listCatalogRecipes,
 } from "./dataStore";
+import { customDinnerToDinner, dinnerSlotId } from "./dinnerSlot";
 import { weekStartISO } from "./week";
 import { pickDinners, pickLunch } from "./planSelection";
 import { recipeToPlannerViews } from "./recipes/recipeValidation";
@@ -14,6 +16,9 @@ import {
   markQueueConsumed,
 } from "./repositories/queueRepository";
 import type {
+  CustomDinner,
+  CustomDinnerInput,
+  DinnerSlot,
   Locks,
   WeekPlan,
   ResolvedWeekPlan,
@@ -57,10 +62,17 @@ function recentWeeks(history: History, beforeWeekOf: string, count: number): Wee
     .slice(0, count);
 }
 
-function recentDinnerIds(history: History, weekOf: string, noRepeatWeeks: number): Set<string> {
+/** Only recipe slots enter the avoid-set — customs never repeat-block anything. */
+export function recentDinnerIds(
+  history: History,
+  weekOf: string,
+  noRepeatWeeks: number
+): Set<string> {
   const ids = new Set<string>();
   for (const w of recentWeeks(history, weekOf, noRepeatWeeks)) {
-    for (const id of w.dinners) ids.add(id);
+    for (const slot of w.dinners) {
+      if (slot.type === "recipe") ids.add(slot.recipeId);
+    }
   }
   return ids;
 }
@@ -105,15 +117,17 @@ async function buildPlan(
   // On regenerate, prefer not re-picking the unlocked meals already on this week.
   const existingWeek = history.weeks.find((w) => w.weekOf === weekOf);
   if (opts?.avoidCurrentUnlocked && existingWeek) {
-    existingWeek.dinners.forEach((id, index) => {
-      if (!locks.dinners[index]) avoidDinners.add(id);
+    existingWeek.dinners.forEach((slot, index) => {
+      if (slot.type === "recipe" && !locks.dinners[index]) {
+        avoidDinners.add(slot.recipeId);
+      }
     });
     if (!locks.girlLunch) avoidGirl.add(existingWeek.girlLunch);
     if (!locks.boyLunch) avoidBoy.add(existingWeek.boyLunch);
   }
 
   const queued = await listPendingForWeek(weekOf);
-  const dinners = pickDinners(
+  const dinnerIds = pickDinners(
     recipes.dinners,
     settings.dinnersPerWeek,
     settings.maxCookMinutes,
@@ -122,6 +136,15 @@ async function buildPlan(
     preferences,
     queued.map((item) => item.recipeId)
   );
+  // A locked slot whose id still matches this week's existing custom slot keeps its
+  // full custom data (name/ingredients/etc.); everything else resolves as a recipe id.
+  const dinners: DinnerSlot[] = dinnerIds.map((id, index) => {
+    const existingSlot = existingWeek?.dinners[index];
+    if (existingSlot?.type === "custom" && existingSlot.custom.id === id) {
+      return existingSlot;
+    }
+    return { type: "recipe", recipeId: id };
+  });
   const girlLunch = pickLunch(recipes.girlLunches, avoidGirl, locks.girlLunch);
   const boyLunch = pickLunch(recipes.boyLunches, avoidBoy, locks.boyLunch);
 
@@ -137,7 +160,7 @@ async function buildPlan(
   });
   await upsertWeekPlan(plan);
   const consumed = queued
-    .filter((item) => dinners.includes(item.recipeId))
+    .filter((item) => dinnerIds.includes(item.recipeId))
     .map((item) => item.id);
   await markQueueConsumed(consumed);
   return plan;
@@ -155,10 +178,13 @@ async function resolvePlan(plan: WeekPlan): Promise<ResolvedWeekPlan> {
   const girlById = new Map(recipes.girlLunches.map((l) => [l.id, l]));
   const boyById = new Map(recipes.boyLunches.map((l) => [l.id, l]));
 
-  const dinners = normalizedPlan.dinners.map((id) => {
-    const dinner = dinnerById.get(id);
+  const dinners = normalizedPlan.dinners.map((slot) => {
+    if (slot.type === "custom") {
+      return customDinnerToDinner(slot.custom);
+    }
+    const dinner = dinnerById.get(slot.recipeId);
     if (!dinner) {
-      throw new Error(`Unknown dinner id in plan: ${id}`);
+      throw new Error(`Unknown dinner id in plan: ${slot.recipeId}`);
     }
     return dinner;
   });
@@ -248,4 +274,43 @@ export async function confirmCurrentPlan(): Promise<ResolvedWeekPlan> {
   const confirmed = markPlanConfirmed(existing, new Date().toISOString());
   await upsertWeekPlan(confirmed);
   return resolvePlan(confirmed);
+}
+
+/**
+ * Explicit mutation: type in an ad hoc dinner for a slot and lock it.
+ * Customs are never written to the recipe catalog and never enter the avoid-set.
+ */
+export async function setCustomDinnerForCurrentWeek(
+  input: CustomDinnerInput
+): Promise<ResolvedWeekPlan> {
+  const weekOf = weekStartISO();
+  const existing = await getWeekPlan(weekOf);
+  if (!existing) {
+    throw new PlanNotFoundError(weekOf);
+  }
+  if (input.index < 0 || input.index >= existing.dinners.length) {
+    throw new Error(`Invalid index: dinner slot ${input.index} does not exist`);
+  }
+
+  const custom: CustomDinner = {
+    id: `custom:${randomUUID()}`,
+    name: input.name,
+    ingredients: input.ingredients,
+    ...(input.cookMinutes !== undefined ? { cookMinutes: input.cookMinutes } : {}),
+    ...(input.protein !== undefined ? { protein: input.protein } : {}),
+  };
+  const customSlot: DinnerSlot = { type: "custom", custom };
+
+  const dinners = existing.dinners.map((slot, i) => (i === input.index ? customSlot : slot));
+  const dinnerLocks = existing.locks.dinners.map((lockId, i) =>
+    i === input.index ? dinnerSlotId(customSlot) : lockId
+  );
+
+  const plan = clearConfirmation({
+    ...existing,
+    dinners,
+    locks: { ...existing.locks, dinners: dinnerLocks },
+  });
+  await upsertWeekPlan(plan);
+  return resolvePlan(plan);
 }

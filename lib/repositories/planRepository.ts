@@ -1,11 +1,21 @@
 import "server-only";
 
-import type { History, WeekPlan } from "@/lib/types";
+import { coerceDinnerSlots } from "@/lib/dinnerSlot";
+import type { DinnerSlot, History, WeekPlan } from "@/lib/types";
 import { getDocumentStore } from "./getDocumentStore";
+
+/** Legacy weeks stored `dinners` as plain recipe id strings. */
+function coerceWeek(week: WeekPlan): WeekPlan {
+  return {
+    ...week,
+    dinners: coerceDinnerSlots(week.dinners as (DinnerSlot | string)[]),
+  };
+}
 
 export async function getHistory(): Promise<History> {
   const store = await getDocumentStore();
-  return store.readJson<History>("history.json");
+  const history = await store.readJson<History>("history.json");
+  return { weeks: history.weeks.map(coerceWeek) };
 }
 
 export async function saveHistory(history: History): Promise<void> {

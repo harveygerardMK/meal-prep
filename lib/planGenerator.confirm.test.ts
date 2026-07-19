@@ -43,7 +43,7 @@ const settings: Settings = {
 
 const plan: WeekPlan = {
   weekOf: "2026-07-13",
-  dinners: ["dinner-1"],
+  dinners: [{ type: "recipe", recipeId: "dinner-1" }],
   girlLunch: "girl-lunch-1",
   boyLunch: "boy-lunch-1",
   locks: { dinners: [null], girlLunch: null, boyLunch: null },

@@ -99,9 +99,33 @@ export type StaplesData = {
 };
 
 export type Locks = {
+  /** Each entry is a recipe id, a custom slot id (`custom:<uuid>`), or null when unlocked. */
   dinners: (string | null)[];
   girlLunch: string | null;
   boyLunch: string | null;
+};
+
+/** Ad hoc dinner entered by hand — never written to the recipe catalog. */
+export type CustomDinner = {
+  /** Opaque slot id, e.g. `custom:<uuid>` — NOT a catalog id. */
+  id: string;
+  name: string;
+  ingredients: string[];
+  cookMinutes?: number;
+  protein?: string;
+};
+
+export type DinnerSlot =
+  | { type: "recipe"; recipeId: string }
+  | { type: "custom"; custom: CustomDinner };
+
+/** Body for setting an ad hoc custom dinner into a plan slot. */
+export type CustomDinnerInput = {
+  index: number;
+  name: string;
+  ingredients: string[];
+  cookMinutes?: number;
+  protein?: string;
 };
 
 /** Household add-ons for the week (paper towels, snacks, etc.). */
@@ -114,7 +138,7 @@ export type MiscGroceryItem = {
 
 export type WeekPlan = {
   weekOf: string;
-  dinners: string[];
+  dinners: DinnerSlot[];
   girlLunch: string;
   boyLunch: string;
   locks: Locks;
