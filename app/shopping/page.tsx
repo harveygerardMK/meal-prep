@@ -101,14 +101,24 @@ export default function ShoppingPage() {
                 <h2 className="font-semibold">{item.name}</h2>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">{item.details}</p>
               </div>
-              <a
-                href={item.instacartSearchUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="shrink-0 rounded-full border border-zinc-200 px-3 py-1 text-xs font-medium dark:border-zinc-700"
-              >
-                Instacart search
-              </a>
+              <div className="flex shrink-0 flex-wrap gap-2">
+                <a
+                  href={item.instacartSearchUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-full border border-zinc-200 px-3 py-1 text-xs font-medium dark:border-zinc-700"
+                >
+                  Instacart
+                </a>
+                <a
+                  href={item.googleSearchUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-full border border-zinc-200 px-3 py-1 text-xs font-medium dark:border-zinc-700"
+                >
+                  Google
+                </a>
+              </div>
             </div>
           </li>
         ))}

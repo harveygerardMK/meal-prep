@@ -5,6 +5,7 @@ export type ShoppingHandoffItem = {
   details: string;
   section: string;
   instacartSearchUrl: string;
+  googleSearchUrl: string;
 };
 
 export type ShoppingHandoff = {
@@ -16,6 +17,10 @@ export type ShoppingHandoff = {
 
 function instacartSearchUrl(query: string): string {
   return `https://www.instacart.com/store/search/${encodeURIComponent(query)}`;
+}
+
+function googleInstacartSearchUrl(query: string): string {
+  return `https://www.google.com/search?q=${encodeURIComponent(`Instacart ${query}`)}`;
 }
 
 export function buildShoppingHandoff(
@@ -30,6 +35,7 @@ export function buildShoppingHandoff(
         details: item.entries.map((entry) => entry.text).join("; "),
         section: section.section,
         instacartSearchUrl: instacartSearchUrl(item.name),
+        googleSearchUrl: googleInstacartSearchUrl(item.name),
       });
     }
   }
@@ -52,7 +58,7 @@ export function buildShoppingHandoff(
     exportText,
     note: canUseLanding
       ? "Instacart landing-page handoff is enabled. Matching still happens on Instacart."
-      : "Export/search-link mode: Instacart Developer Platform access is not configured or is closed to new apps.",
+      : "Export/search-link mode: each item has a direct Instacart search and a Google “Instacart …” backup link.",
   };
 }
 
