@@ -1,10 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { DinnerCard } from "./components/DinnerCard";
 import { LunchCard } from "./components/LunchCard";
 import { GroceryListView } from "./components/GroceryListView";
+import {
+  AppHeader,
+  Button,
+  HeaderNavLink,
+  LinkButton,
+  SectionHeading,
+} from "./components/brand";
 import type { ResolvedWeekPlan, Locks } from "@/lib/types";
 import type { GrocerySection } from "@/lib/groceryList";
 
@@ -51,80 +57,95 @@ export default function Home() {
 
   if (!data) {
     return (
-      <main className="mx-auto max-w-3xl px-6 py-16 text-center text-zinc-500">
-        Loading this week&apos;s plan…
-      </main>
+      <>
+        <AppHeader
+          nav={<HeaderNavLink href="/" active>This week</HeaderNavLink>}
+          actions={
+            <LinkButton href="/settings" variant="ghost">
+              Settings
+            </LinkButton>
+          }
+        />
+        <main className="mx-auto max-w-6xl px-6 py-16 text-center text-muted">
+          Loading this week&apos;s plan…
+        </main>
+      </>
     );
   }
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-6 py-10">
-      <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">This Week&apos;s Plan</h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Week of {data.plan.weekOf}
+    <>
+      <AppHeader
+        nav={<HeaderNavLink href="/" active>This week</HeaderNavLink>}
+        actions={
+          <>
+            <LinkButton href="/settings" variant="secondary">
+              Settings
+            </LinkButton>
+            <Button onClick={regenerate} disabled={busy} type="button">
+              {busy ? "Shuffling…" : "Regenerate"}
+            </Button>
+          </>
+        }
+      />
+      <main className="mx-auto w-full max-w-6xl px-6 py-10">
+        <div className="mb-10">
+          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-accent">
+            Weekly plan
           </p>
+          <h1 className="font-serif text-4xl font-semibold tracking-tight text-foreground">
+            This Week&apos;s Plan
+          </h1>
+          <p className="mt-2 text-sm text-muted">Week of {data.plan.weekOf}</p>
         </div>
-        <div className="flex gap-2">
-          <Link
-            href="/settings"
-            className="rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900"
-          >
-            Settings
-          </Link>
-          <button
-            onClick={regenerate}
-            disabled={busy}
-            className="rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background disabled:opacity-50"
-          >
-            {busy ? "Shuffling…" : "Regenerate"}
-          </button>
-        </div>
-      </div>
 
-      <section className="mb-8">
-        <h2 className="mb-3 text-lg font-semibold">Dinners</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {data.plan.dinners.map((dinner, i) => (
-            <DinnerCard
-              key={`${dinner.id}-${i}`}
-              dinner={dinner}
-              locked={lockedDinners[i] ?? false}
-              onToggleLock={() =>
-                setLockedDinners((prev) => {
-                  const next = [...prev];
-                  next[i] = !next[i];
-                  return next;
-                })
-              }
+        <section className="mb-12">
+          <SectionHeading>Dinners</SectionHeading>
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {data.plan.dinners.map((dinner, i) => (
+              <DinnerCard
+                key={`${dinner.id}-${i}`}
+                dinner={dinner}
+                locked={lockedDinners[i] ?? false}
+                onToggleLock={() =>
+                  setLockedDinners((prev) => {
+                    const next = [...prev];
+                    next[i] = !next[i];
+                    return next;
+                  })
+                }
+              />
+            ))}
+          </div>
+        </section>
+
+        <section className="mb-12">
+          <SectionHeading description="Same lunch Monday through Friday.">
+            Lunches
+          </SectionHeading>
+          <div className="grid gap-8 sm:grid-cols-2">
+            <LunchCard
+              label="Girl lunch"
+              lunch={data.plan.girlLunch}
+              locked={lockedGirl}
+              onToggleLock={() => setLockedGirl((v) => !v)}
             />
-          ))}
-        </div>
-      </section>
+            <LunchCard
+              label="Boy lunch"
+              lunch={data.plan.boyLunch}
+              locked={lockedBoy}
+              onToggleLock={() => setLockedBoy((v) => !v)}
+            />
+          </div>
+        </section>
 
-      <section className="mb-8">
-        <h2 className="mb-3 text-lg font-semibold">Lunches</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <LunchCard
-            label="Girl lunch"
-            lunch={data.plan.girlLunch}
-            locked={lockedGirl}
-            onToggleLock={() => setLockedGirl((v) => !v)}
-          />
-          <LunchCard
-            label="Boy lunch"
-            lunch={data.plan.boyLunch}
-            locked={lockedBoy}
-            onToggleLock={() => setLockedBoy((v) => !v)}
-          />
-        </div>
-      </section>
-
-      <section>
-        <h2 className="mb-3 text-lg font-semibold">Grocery List</h2>
-        <GroceryListView sections={data.groceryList} />
-      </section>
-    </main>
+        <section>
+          <SectionHeading description="Check off items as you shop.">
+            Grocery List
+          </SectionHeading>
+          <GroceryListView sections={data.groceryList} />
+        </section>
+      </main>
+    </>
   );
 }
