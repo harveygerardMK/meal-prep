@@ -78,6 +78,10 @@ process.on("uncaughtException", (error) => {
   process.exit(1);
 });
 
+// `preview`, `deploy`, and `upload` do not build on their own — always build
+// first so we ship the latest code, then run the requested command.
+const steps = command === "build" ? ["build"] : ["build", command];
+
 try {
   if (!existsSync(proxyPath)) {
     throw new Error("proxy.ts not found — refusing to run Cloudflare build swap");
@@ -86,14 +90,20 @@ try {
   renameSync(proxyPath, proxyBackupPath);
   swapped = true;
 
-  const result = spawnSync(
-    "npx",
-    ["opennextjs-cloudflare", command],
-    { cwd: root, stdio: "inherit", shell: process.platform === "win32" }
-  );
+  for (const step of steps) {
+    const result = spawnSync(
+      "npx",
+      ["opennextjs-cloudflare", step],
+      { cwd: root, stdio: "inherit", shell: process.platform === "win32" }
+    );
+    if (result.status !== 0) {
+      cleanup();
+      process.exit(result.status ?? 1);
+    }
+  }
 
   cleanup();
-  process.exit(result.status ?? 1);
+  process.exit(0);
 } catch (error) {
   cleanup();
   console.error(error);
