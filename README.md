@@ -26,8 +26,11 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-- `/` — this week’s plan, lock meals, regenerate, grocery list
-- `/settings` — dinners per week, max cook time, no-repeat window, servings
+- `/` — this week’s plan, lock meals, regenerate, grocery list, weekly sliders
+- `/recipes` — curated catalog (add/edit/favorite/archive)
+- `/import` — TikTok link + caption/notes → review draft → queue next week
+- `/shopping` — copyable grocery export + Instacart search links
+- `/settings` — dinners per week, cook effort/novelty defaults, servings
 - `/login` — household password (only when auth env vars are set)
 
 ## Scripts
@@ -58,10 +61,14 @@ Open [http://localhost:3000](http://localhost:3000).
 
 Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, Vitest, `jose` sessions.
 
-## Roadmap (next)
+## Roadmap status
 
-1. Postgres repository adapter for hosted multi-device sync
-2. In-app recipe catalog
+Shipped on `feature/roadmap-foundation`:
+
+1. Private foundation (repositories, auth gate, read-only plan GET)
+2. Recipe catalog
 3. Weekly effort/novelty sliders
-4. TikTok import with review
-5. Shopping handoff / Instacart-ready export
+4. TikTok import with review + next-week queue
+5. Shopping export / Instacart search-link handoff (landing API flagged off until access exists)
+
+Still next: Postgres adapter for true multi-device serverless hosting.
