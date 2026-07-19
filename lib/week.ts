@@ -37,7 +37,7 @@ export function dinnerSlotDate(weekOf: string, index: number): Date {
 
 export type DinnerFocus = {
   index: number;
-  kind: "tonight" | "up_next";
+  kind: "tonight" | "up_next" | "week_done";
   dayLabel: string;
 };
 
@@ -64,7 +64,7 @@ export function resolveDinnerFocus(
   const lastDay = dinnerSlotDate(weekOf, last);
   return {
     index: last,
-    kind: "up_next",
+    kind: "week_done",
     dayLabel: weekdayShort(lastDay),
   };
 }

@@ -99,6 +99,9 @@ export default function Home() {
     setError(null);
     setStatus(null);
     setConfirmRegen(false);
+    const beforeDinnerIds = data.plan.dinners.map((d) => d.id);
+    const beforeGirl = data.plan.girlLunch.id;
+    const beforeBoy = data.plan.boyLunch.id;
     try {
       const locks: Locks = {
         dinners: data.plan.dinners.map((d, i) => (lockedDinners[i] ? d.id : null)),
@@ -114,12 +117,26 @@ export default function Home() {
       if (!res.ok) {
         throw new Error(json.error || "Failed to regenerate plan");
       }
-      setData(json as PlanResponse);
-      setLockedDinners(json.plan.locks.dinners.map((id: string | null) => id !== null));
-      setLockedGirl(json.plan.locks.girlLunch !== null);
-      setLockedBoy(json.plan.locks.boyLunch !== null);
-      setPreferences(json.plan.preferences);
-      setStatus("Plan updated — unlocked meals were reshuffled.");
+      const next = json as PlanResponse;
+      setData(next);
+      setLockedDinners(next.plan.locks.dinners.map((id: string | null) => id !== null));
+      setLockedGirl(next.plan.locks.girlLunch !== null);
+      setLockedBoy(next.plan.locks.boyLunch !== null);
+      setPreferences(next.plan.preferences);
+
+      const dinnersChanged = next.plan.dinners.some(
+        (d, i) => d.id !== beforeDinnerIds[i]
+      );
+      const lunchesChanged =
+        next.plan.girlLunch.id !== beforeGirl ||
+        next.plan.boyLunch.id !== beforeBoy;
+      if (dinnersChanged || lunchesChanged) {
+        setStatus("Plan updated — unlocked meals were reshuffled.");
+      } else {
+        setStatus(
+          "No different meals fit your current settings. Try adjusting effort/originality or unlocking other days."
+        );
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to regenerate plan");
     } finally {
@@ -152,7 +169,7 @@ export default function Home() {
     <main className="mx-auto w-full max-w-6xl px-6 py-10">
       <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-accent">
+          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-accent-text">
             Weekly plan
           </p>
           <h1 className="font-serif text-4xl font-semibold tracking-tight text-foreground">
@@ -220,8 +237,13 @@ export default function Home() {
 
       {focusDinner && focus && (
         <section className="mb-12 border-t border-border pt-6">
-          <p className="text-[11px] font-bold uppercase tracking-[0.06em] text-accent">
-            {focus.kind === "tonight" ? "Tonight" : "Up next"} · {focus.dayLabel}
+          <p className="text-[11px] font-bold uppercase tracking-[0.06em] text-accent-text">
+            {focus.kind === "tonight"
+              ? "Tonight"
+              : focus.kind === "week_done"
+                ? "Last dinner"
+                : "Up next"}{" "}
+            · {focus.dayLabel}
           </p>
           <h2 className="mt-2 font-serif text-3xl font-semibold tracking-tight">
             {focusDinner.name}

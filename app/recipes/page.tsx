@@ -12,6 +12,7 @@ import {
 
 export default function RecipesPage() {
   const [recipes, setRecipes] = useState<CatalogRecipe[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | MealKind | "archived" | "favorites">("all");
 
@@ -27,6 +28,8 @@ export default function RecipesPage() {
         if (!cancelled) {
           setError(err instanceof Error ? err.message : "Failed to load recipes");
         }
+      } finally {
+        if (!cancelled) setLoading(false);
       }
     }
     load();
@@ -87,7 +90,7 @@ export default function RecipesPage() {
     <main className="mx-auto w-full max-w-6xl px-6 py-10">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-accent">
+            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-accent-text">
               Catalog
             </p>
             <h1 className="font-serif text-4xl font-semibold tracking-tight">
@@ -133,59 +136,68 @@ export default function RecipesPage() {
           </p>
         )}
 
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {visible.map((recipe) => (
-            <RecipeCard
-              key={recipe.id}
-              name={recipe.name}
-              eyebrow={`${kindLabel(recipe.kind)}${
-                recipe.status === "archived" ? " · archived" : ""
-              }`}
-              meta={
-                recipe.kind === "dinner"
-                  ? [
-                      `${recipe.cookMinutes ?? "?"} min`,
-                      recipe.protein,
-                      ...recipe.tags.slice(0, 2),
-                    ]
-                  : [`${recipe.ingredients.length} ingredients`, ...recipe.tags.slice(0, 2)]
-              }
-              action={
-                <CardActionButton
-                  active={recipe.favorite}
-                  onClick={() => toggleFavorite(recipe)}
-                  activeLabel="Favorited"
-                  inactiveLabel="Favorite"
-                />
-              }
-            >
-              <div className="flex flex-wrap gap-2">
-                <Link
-                  href={`/recipes/${recipe.id}`}
-                  className="text-sm font-semibold text-foreground underline-offset-2 hover:underline"
+        {loading ? (
+          <p className="text-sm text-muted">Loading recipes…</p>
+        ) : (
+          <>
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {visible.map((recipe) => (
+                <RecipeCard
+                  key={recipe.id}
+                  name={recipe.name}
+                  eyebrow={`${kindLabel(recipe.kind)}${
+                    recipe.status === "archived" ? " · archived" : ""
+                  }`}
+                  meta={
+                    recipe.kind === "dinner"
+                      ? [
+                          `${recipe.cookMinutes ?? "?"} min`,
+                          recipe.protein,
+                          ...recipe.tags.slice(0, 2),
+                        ]
+                      : [
+                          `${recipe.ingredients.length} ingredients`,
+                          ...recipe.tags.slice(0, 2),
+                        ]
+                  }
+                  action={
+                    <CardActionButton
+                      active={recipe.favorite}
+                      onClick={() => toggleFavorite(recipe)}
+                      activeLabel="Favorited"
+                      inactiveLabel="Favorite"
+                    />
+                  }
                 >
-                  Edit
-                </Link>
-                {recipe.status !== "archived" && (
-                  <button
-                    type="button"
-                    onClick={() => archive(recipe)}
-                    className="text-sm font-semibold text-muted hover:text-foreground"
-                  >
-                    Archive
-                  </button>
-                )}
-              </div>
-            </RecipeCard>
-          ))}
-        </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Link
+                      href={`/recipes/${recipe.id}`}
+                      className="text-sm font-semibold text-foreground underline-offset-2 hover:underline"
+                    >
+                      Edit
+                    </Link>
+                    {recipe.status !== "archived" && (
+                      <button
+                        type="button"
+                        onClick={() => archive(recipe)}
+                        className="text-sm font-semibold text-muted hover:text-foreground"
+                      >
+                        Archive
+                      </button>
+                    )}
+                  </div>
+                </RecipeCard>
+              ))}
+            </div>
 
-        {visible.length === 0 && (
-          <p className="text-sm text-muted">
-            {filter === "all"
-              ? "No active recipes yet. Add one to start building the household catalog."
-              : "No recipes in this filter."}
-          </p>
+            {visible.length === 0 && (
+              <p className="text-sm text-muted">
+                {filter === "all"
+                  ? "No active recipes yet. Add one to start building the household catalog."
+                  : "No recipes in this filter."}
+              </p>
+            )}
+          </>
         )}
       </main>
   );

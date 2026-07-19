@@ -10,18 +10,32 @@ export function shuffle<T>(arr: T[]): T[] {
   return copy;
 }
 
+/**
+ * Sort by score (lower better), then shuffle within equal-score ties so
+ * regenerate is not deterministic when the catalog is mostly 3/3.
+ */
 function rankDinners(
   dinners: Dinner[],
   preferences: WeekPreferences,
   avoidIds: Set<string>
 ): Dinner[] {
-  return [...dinners].sort((a, b) => {
-    const scoreDiff =
-      scoreDinnerCandidate(a, preferences, avoidIds) -
-      scoreDinnerCandidate(b, preferences, avoidIds);
-    if (scoreDiff !== 0) return scoreDiff;
-    return a.id.localeCompare(b.id);
-  });
+  const scored = dinners.map((dinner) => ({
+    dinner,
+    score: scoreDinnerCandidate(dinner, preferences, avoidIds),
+  }));
+  scored.sort(
+    (a, b) => a.score - b.score || a.dinner.id.localeCompare(b.dinner.id)
+  );
+
+  const ranked: Dinner[] = [];
+  let i = 0;
+  while (i < scored.length) {
+    let j = i + 1;
+    while (j < scored.length && scored[j].score === scored[i].score) j += 1;
+    ranked.push(...shuffle(scored.slice(i, j).map((entry) => entry.dinner)));
+    i = j;
+  }
+  return ranked;
 }
 
 export function pickDinners(

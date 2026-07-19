@@ -10,6 +10,8 @@
   --accent: #e33d26;
   --accent-hover: #c73420;
   --accent-foreground: #ffffff;
+  /* Darker than --accent so 11px eyebrow labels meet WCAG AA (~4.5:1). */
+  --accent-text: #b02a1a;
   --accent-soft: #fdf0ee;
   --photo-wash-1: #f3ede6;
   --photo-wash-2: #e8efea;
@@ -28,6 +30,7 @@
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-foreground: var(--accent-foreground);
+  --color-accent-text: var(--accent-text);
   --color-accent-soft: var(--accent-soft);
   --color-photo-wash-1: var(--photo-wash-1);
   --color-photo-wash-2: var(--photo-wash-2);

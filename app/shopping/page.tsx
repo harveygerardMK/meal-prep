@@ -72,7 +72,7 @@ export default function ShoppingPage() {
     <main className="mx-auto w-full max-w-6xl px-6 py-10">
       <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-accent">
+          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-accent-text">
             Shopping
           </p>
           <h1 className="font-serif text-4xl font-semibold tracking-tight">

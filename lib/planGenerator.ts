@@ -67,7 +67,8 @@ function emptyLocks(dinnersPerWeek: number): Locks {
 async function buildPlan(
   weekOf: string,
   locks: Locks,
-  preferences: WeekPreferences
+  preferences: WeekPreferences,
+  opts?: { avoidCurrentUnlocked?: boolean }
 ): Promise<WeekPlan> {
   const [recipes, settings, history] = await Promise.all([
     getRecipes(),
@@ -78,6 +79,16 @@ async function buildPlan(
   const avoidDinners = recentDinnerIds(history, weekOf, settings.noRepeatWeeks);
   const avoidGirl = recentLunchIds(history, weekOf, settings.noRepeatWeeks, "girlLunch");
   const avoidBoy = recentLunchIds(history, weekOf, settings.noRepeatWeeks, "boyLunch");
+
+  // On regenerate, prefer not re-picking the unlocked meals already on this week.
+  const existingWeek = history.weeks.find((w) => w.weekOf === weekOf);
+  if (opts?.avoidCurrentUnlocked && existingWeek) {
+    existingWeek.dinners.forEach((id, index) => {
+      if (!locks.dinners[index]) avoidDinners.add(id);
+    });
+    if (!locks.girlLunch) avoidGirl.add(existingWeek.girlLunch);
+    if (!locks.boyLunch) avoidBoy.add(existingWeek.boyLunch);
+  }
 
   const queued = await listPendingForWeek(weekOf);
   const dinners = pickDinners(
@@ -92,7 +103,6 @@ async function buildPlan(
   const girlLunch = pickLunch(recipes.girlLunches, avoidGirl, locks.girlLunch);
   const boyLunch = pickLunch(recipes.boyLunches, avoidBoy, locks.boyLunch);
 
-  const existingWeek = history.weeks.find((w) => w.weekOf === weekOf);
   const plan: WeekPlan = {
     weekOf,
     dinners,
@@ -195,6 +205,8 @@ export async function regenerateCurrentPlan(
     cookEffortTarget: settings.cookEffortTarget,
     noveltyTarget: settings.noveltyTarget,
   };
-  const plan = await buildPlan(weekOf, locks, prefs);
+  const plan = await buildPlan(weekOf, locks, prefs, {
+    avoidCurrentUnlocked: true,
+  });
   return resolvePlan(plan);
 }

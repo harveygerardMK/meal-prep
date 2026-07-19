@@ -42,7 +42,7 @@ export function RecipeCard({
       </div>
       <div className="pt-3">
         {eyebrow ? (
-          <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.06em] text-accent">
+          <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.06em] text-accent-text">
             {eyebrow}
           </p>
         ) : null}

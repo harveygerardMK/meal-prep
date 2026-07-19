@@ -30,4 +30,25 @@ describe("scoreDinnerCandidate", () => {
       scoreDinnerCandidate(candidate, prefs, new Set())
     );
   });
+
+  it("uses cook time and tags when stored scores are flat 3/3", () => {
+    const quickFavorite = dinner({
+      id: "quick",
+      cookMinutes: 15,
+      tags: ["quick", "favorite"],
+      effortScore: 3,
+      noveltyScore: 3,
+    });
+    const longNew = dinner({
+      id: "long",
+      cookMinutes: 55,
+      tags: ["add-more-variety"],
+      effortScore: 3,
+      noveltyScore: 3,
+    });
+    const easyFamiliar = { cookEffortTarget: 2, noveltyTarget: 1 };
+    expect(scoreDinnerCandidate(quickFavorite, easyFamiliar, new Set())).toBeLessThan(
+      scoreDinnerCandidate(longNew, easyFamiliar, new Set())
+    );
+  });
 });

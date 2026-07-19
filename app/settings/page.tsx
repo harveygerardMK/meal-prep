@@ -122,7 +122,7 @@ export default function SettingsPage() {
           <>
             <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-accent">
+                <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-accent-text">
                   Preferences
                 </p>
                 <h1 className="font-serif text-4xl font-semibold tracking-tight">Settings</h1>

@@ -3,6 +3,9 @@ import { Source_Sans_3, Source_Serif_4 } from "next/font/google";
 import { AppShell } from "./components/AppShell";
 import "./globals.css";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const sourceSans = Source_Sans_3({
   variable: "--font-source-sans",
   subsets: ["latin"],

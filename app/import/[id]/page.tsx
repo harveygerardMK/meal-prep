@@ -80,7 +80,7 @@ export default function ImportReviewPage() {
         ) : (
           <>
             <div className="mb-8">
-              <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-accent">
+              <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-accent-text">
                 Review
               </p>
               <h1 className="font-serif text-4xl font-semibold tracking-tight">

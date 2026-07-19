@@ -42,7 +42,7 @@ export default function EditRecipePage() {
         ) : (
           <>
             <div className="mb-10">
-              <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-accent">
+              <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-accent-text">
                 Catalog
               </p>
               <h1 className="font-serif text-4xl font-semibold tracking-tight">

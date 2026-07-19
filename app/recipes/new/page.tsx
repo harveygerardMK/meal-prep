@@ -9,7 +9,7 @@ export default function NewRecipePage() {
   return (
     <main className="mx-auto w-full max-w-3xl px-6 py-10">
       <div className="mb-10">
-        <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-accent">
+        <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-accent-text">
           Catalog
         </p>
         <h1 className="font-serif text-4xl font-semibold tracking-tight">Add recipe</h1>

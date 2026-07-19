@@ -35,7 +35,7 @@ export default function LoginPage() {
 
   return (
     <main className="mx-auto flex min-h-full w-full max-w-sm flex-col justify-center px-6 py-16">
-      <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-accent">
+      <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-accent-text">
         Meal Prep
       </p>
       <h1 className="font-serif text-4xl font-semibold tracking-tight">Household login</h1>

@@ -92,6 +92,79 @@ describe("pickDinners", () => {
     expect(result[0]).toBe("pork-a");
     expect(result[1]).toBeTruthy();
   });
+
+  it("can return different dinners across regenerations when unlocked", () => {
+    const catalog: Dinner[] = [
+      ...dinners,
+      {
+        id: "fish-a",
+        name: "Fish A",
+        protein: "fish",
+        cookMinutes: 20,
+        tags: ["quick"],
+        ingredients: [],
+      },
+      {
+        id: "veg-a",
+        name: "Veg A",
+        protein: "vegetarian",
+        cookMinutes: 25,
+        tags: ["vegetarian"],
+        ingredients: [],
+      },
+      {
+        id: "turkey-a",
+        name: "Turkey A",
+        protein: "turkey",
+        cookMinutes: 30,
+        tags: ["weeknight"],
+        ingredients: [],
+      },
+      {
+        id: "lamb-a",
+        name: "Lamb A",
+        protein: "lamb",
+        cookMinutes: 35,
+        tags: ["favorite"],
+        ingredients: [],
+      },
+    ];
+
+    const results = new Set<string>();
+    for (let i = 0; i < 20; i += 1) {
+      const picked = pickDinners(
+        catalog,
+        3,
+        40,
+        new Set(),
+        [null, null, null],
+        { cookEffortTarget: 3, noveltyTarget: 3 }
+      );
+      results.add(picked.join(","));
+    }
+    expect(results.size).toBeGreaterThan(1);
+  });
+
+  it("prefers avoiding recent ids so regenerate can leave current meals", () => {
+    vi.spyOn(Math, "random").mockReturnValue(0);
+    const first = pickDinners(
+      dinners,
+      2,
+      40,
+      new Set(),
+      [null, null],
+      { cookEffortTarget: 3, noveltyTarget: 3 }
+    );
+    const second = pickDinners(
+      dinners,
+      2,
+      40,
+      new Set(first),
+      [null, null],
+      { cookEffortTarget: 3, noveltyTarget: 3 }
+    );
+    expect(second).not.toEqual(first);
+  });
 });
 
 describe("pickLunch", () => {

@@ -56,7 +56,7 @@ describe("resolveDinnerFocus", () => {
   });
 
   it("returns the next upcoming slot when today has no dinner", () => {
-    // Sunday after a Mon–Thu dinner week
+    // Sunday before a Mon–Thu dinner week
     const focus = resolveDinnerFocus(
       "2026-07-13",
       4,
@@ -64,5 +64,15 @@ describe("resolveDinnerFocus", () => {
     );
     expect(focus?.kind).toBe("up_next");
     expect(focus?.index).toBe(0);
+  });
+
+  it("returns week_done when every dinner slot is already past", () => {
+    const focus = resolveDinnerFocus(
+      "2026-07-13",
+      4,
+      new Date(2026, 6, 19, 18, 0, 0)
+    );
+    expect(focus?.kind).toBe("week_done");
+    expect(focus?.index).toBe(3);
   });
 });
