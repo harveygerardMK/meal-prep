@@ -272,6 +272,116 @@
       "cookMinutes": 20,
       "tags": ["fish", "quick", "add-more-variety"],
       "ingredients": ["4 tilapia fillets", "1 bunch asparagus", "Old Bay or lemon pepper seasoning", "Olive oil"]
+    },
+    {
+      "id": "grilled-cheese-tomato-soup",
+      "name": "Grilled Cheese & Tomato Soup",
+      "protein": "vegetarian",
+      "cookMinutes": 25,
+      "tags": ["favorite", "soup"],
+      "effortScore": 2,
+      "noveltyScore": 1,
+      "ingredients": ["8 slices sandwich bread", "1 lb sliced cheddar", "4 tbsp butter", "2 cans tomato soup", "1/2 cup heavy cream"]
+    },
+    {
+      "id": "gnocchi-arugula-feta",
+      "name": "Gnocchi with Arugula & Feta",
+      "protein": "vegetarian",
+      "cookMinutes": 25,
+      "tags": ["favorite", "pasta"],
+      "effortScore": 2,
+      "noveltyScore": 1,
+      "ingredients": ["1 lb potato gnocchi", "4 cups arugula", "1/2 cup feta, crumbled", "1 lemon, juiced", "2 tbsp olive oil"]
+    },
+    {
+      "id": "eamon-bec-gnocchi-soup",
+      "name": "Eamon & Bec Gnocchi Soup",
+      "protein": "pork",
+      "cookMinutes": 35,
+      "tags": ["favorite", "soup"],
+      "effortScore": 3,
+      "noveltyScore": 2,
+      "ingredients": ["1 lb potato gnocchi", "6 cups broth", "2 cups kale or spinach", "1 lb italian sausage", "1/2 cup parmesan"]
+    },
+    {
+      "id": "kielbasa-soup",
+      "name": "Kielbasa Soup",
+      "protein": "pork",
+      "cookMinutes": 35,
+      "tags": ["favorite", "soup"],
+      "effortScore": 3,
+      "noveltyScore": 2,
+      "ingredients": ["1 lb kielbasa, sliced", "1 lb potatoes, diced", "2 cups cabbage or kale, chopped", "6 cups chicken broth", "1 tsp smoked paprika"]
+    },
+    {
+      "id": "lemon-butter-chicken-orzo",
+      "name": "Lemon Butter Chicken & Orzo",
+      "protein": "chicken",
+      "cookMinutes": 35,
+      "tags": ["favorite", "pasta"],
+      "effortScore": 3,
+      "noveltyScore": 2,
+      "ingredients": ["1 lb chicken breast, cubed", "1 lb orzo", "2 lemons, juiced", "4 tbsp butter", "1/2 cup parmesan", "2 cups spinach"]
+    },
+    {
+      "id": "tamales",
+      "name": "Tamales",
+      "protein": "pork",
+      "cookMinutes": 40,
+      "tags": ["favorite"],
+      "effortScore": 4,
+      "noveltyScore": 2,
+      "ingredients": ["2 cups masa harina", "1 lb pork or chicken filling", "1 pack corn husks", "1 cup red or green sauce"]
+    },
+    {
+      "id": "dumplings",
+      "name": "Dumplings",
+      "protein": "pork",
+      "cookMinutes": 35,
+      "tags": ["favorite"],
+      "effortScore": 3,
+      "noveltyScore": 2,
+      "ingredients": ["1 lb ground pork", "1 pack wonton wrappers", "2 in ginger, minced", "4 scallions, sliced", "3 tbsp soy sauce", "1 tbsp sesame oil"]
+    },
+    {
+      "id": "brats-corn",
+      "name": "Brats & Corn on the Cob",
+      "protein": "pork",
+      "cookMinutes": 30,
+      "tags": ["favorite", "grill"],
+      "effortScore": 2,
+      "noveltyScore": 1,
+      "ingredients": ["4 bratwurst links", "4 buns", "4 ears corn on the cob", "4 tbsp butter"]
+    },
+    {
+      "id": "adobo-cauliflower",
+      "name": "Adobo Cauliflower",
+      "protein": "vegetarian",
+      "cookMinutes": 35,
+      "tags": ["favorite"],
+      "effortScore": 3,
+      "noveltyScore": 2,
+      "ingredients": ["1 head cauliflower, florets", "1/3 cup soy sauce", "1/4 cup vinegar", "4 cloves garlic, minced", "2 bay leaves"]
+    },
+    {
+      "id": "taco-cups",
+      "name": "Taco Cups",
+      "protein": "beef",
+      "cookMinutes": 30,
+      "tags": ["favorite", "tacos"],
+      "effortScore": 2,
+      "noveltyScore": 2,
+      "ingredients": ["24 wonton or tortilla cups", "1 lb ground beef", "1 packet taco seasoning", "1 cup shredded cheese", "1 cup salsa"]
+    },
+    {
+      "id": "udon",
+      "name": "Udon",
+      "protein": "egg",
+      "cookMinutes": 30,
+      "tags": ["favorite"],
+      "effortScore": 2,
+      "noveltyScore": 2,
+      "ingredients": ["1 lb udon noodles", "4 cups dashi or broth", "3 tbsp soy sauce", "2 tbsp mirin", "4 scallions, sliced", "4 soft-boiled eggs"]
     }
   ],
   "girlLunches": [
