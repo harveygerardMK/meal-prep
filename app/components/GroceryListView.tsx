@@ -60,28 +60,29 @@ export function GroceryListView({
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <div className="grid gap-8 sm:grid-cols-2">
       {sections.map((section) => (
-        <div
-          key={section.section}
-          className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
-        >
-          <h3 className="mb-2 font-semibold">{section.section}</h3>
-          <ul className="space-y-2 text-sm">
+        <div key={section.section} className="border-t border-border pt-4">
+          <h3 className="mb-3 text-sm font-semibold text-foreground">
+            {section.section}
+          </h3>
+          <ul className="space-y-3 text-sm">
             {section.items.map((item) => {
               const isChecked = checked.has(item.name);
               return (
                 <li key={item.name}>
-                  <label className="flex items-start gap-2">
+                  <label className="flex cursor-pointer items-start gap-3">
                     <input
                       type="checkbox"
-                      className="mt-0.5"
+                      className="mt-1 h-4 w-4 accent-[var(--accent)]"
                       checked={isChecked}
                       onChange={() => toggle(item.name)}
                     />
                     <span className={isChecked ? "opacity-60 line-through" : undefined}>
-                      <span className="font-medium capitalize">{item.name}</span>
-                      <span className="block text-xs text-zinc-500 dark:text-zinc-400">
+                      <span className="font-medium capitalize text-foreground">
+                        {item.name}
+                      </span>
+                      <span className="mt-0.5 block text-[13px] text-meta">
                         {item.entries.map((e) => e.text).join("; ")}
                       </span>
                     </span>

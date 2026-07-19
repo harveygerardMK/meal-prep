@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import type { CatalogRecipe, MealKind } from "@/lib/types";
+import { Button, fieldClassName, labelClassName } from "./brand";
 
 type Props = {
   initial?: CatalogRecipe;
@@ -72,16 +73,16 @@ export function RecipeForm({ initial, onSaved }: Props) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} className="space-y-5">
       <div>
-        <label htmlFor="kind" className="mb-1 block text-sm font-medium">
+        <label htmlFor="kind" className={labelClassName}>
           Kind
         </label>
         <select
           id="kind"
           value={form.kind}
           onChange={(e) => setForm({ ...form, kind: e.target.value as MealKind })}
-          className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
+          className={fieldClassName}
         >
           <option value="dinner">Dinner</option>
           <option value="girl_lunch">Girl lunch</option>
@@ -90,7 +91,7 @@ export function RecipeForm({ initial, onSaved }: Props) {
       </div>
 
       <div>
-        <label htmlFor="name" className="mb-1 block text-sm font-medium">
+        <label htmlFor="name" className={labelClassName}>
           Name
         </label>
         <input
@@ -98,14 +99,14 @@ export function RecipeForm({ initial, onSaved }: Props) {
           required
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
-          className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
+          className={fieldClassName}
         />
       </div>
 
       {form.kind === "dinner" && (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-5 sm:grid-cols-2">
           <div>
-            <label htmlFor="protein" className="mb-1 block text-sm font-medium">
+            <label htmlFor="protein" className={labelClassName}>
               Protein
             </label>
             <input
@@ -113,11 +114,11 @@ export function RecipeForm({ initial, onSaved }: Props) {
               required
               value={form.protein}
               onChange={(e) => setForm({ ...form, protein: e.target.value })}
-              className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
+              className={fieldClassName}
             />
           </div>
           <div>
-            <label htmlFor="cookMinutes" className="mb-1 block text-sm font-medium">
+            <label htmlFor="cookMinutes" className={labelClassName}>
               Cook minutes
             </label>
             <input
@@ -127,15 +128,15 @@ export function RecipeForm({ initial, onSaved }: Props) {
               required
               value={form.cookMinutes}
               onChange={(e) => setForm({ ...form, cookMinutes: Number(e.target.value) })}
-              className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
+              className={fieldClassName}
             />
           </div>
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-5 sm:grid-cols-2">
         <div>
-          <label htmlFor="effortScore" className="mb-1 block text-sm font-medium">
+          <label htmlFor="effortScore" className={labelClassName}>
             Effort (1 easy – 5 hard)
           </label>
           <input
@@ -145,11 +146,11 @@ export function RecipeForm({ initial, onSaved }: Props) {
             max={5}
             value={form.effortScore}
             onChange={(e) => setForm({ ...form, effortScore: Number(e.target.value) })}
-            className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
+            className={fieldClassName}
           />
         </div>
         <div>
-          <label htmlFor="noveltyScore" className="mb-1 block text-sm font-medium">
+          <label htmlFor="noveltyScore" className={labelClassName}>
             Novelty (1 familiar – 5 new)
           </label>
           <input
@@ -159,72 +160,69 @@ export function RecipeForm({ initial, onSaved }: Props) {
             max={5}
             value={form.noveltyScore}
             onChange={(e) => setForm({ ...form, noveltyScore: Number(e.target.value) })}
-            className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
+            className={fieldClassName}
+          />
+        </div>
+      </div>
+
+      <div className="grid gap-5 lg:grid-cols-2">
+        <div>
+          <label htmlFor="ingredients" className={labelClassName}>
+            Ingredients (one per line)
+          </label>
+          <textarea
+            id="ingredients"
+            rows={8}
+            value={form.ingredients}
+            onChange={(e) => setForm({ ...form, ingredients: e.target.value })}
+            className={fieldClassName}
+          />
+        </div>
+        <div>
+          <label htmlFor="instructions" className={labelClassName}>
+            Instructions (one step per line)
+          </label>
+          <textarea
+            id="instructions"
+            rows={8}
+            value={form.instructions}
+            onChange={(e) => setForm({ ...form, instructions: e.target.value })}
+            className={fieldClassName}
           />
         </div>
       </div>
 
       <div>
-        <label htmlFor="ingredients" className="mb-1 block text-sm font-medium">
-          Ingredients (one per line)
-        </label>
-        <textarea
-          id="ingredients"
-          rows={6}
-          value={form.ingredients}
-          onChange={(e) => setForm({ ...form, ingredients: e.target.value })}
-          className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="instructions" className="mb-1 block text-sm font-medium">
-          Instructions (one step per line)
-        </label>
-        <textarea
-          id="instructions"
-          rows={5}
-          value={form.instructions}
-          onChange={(e) => setForm({ ...form, instructions: e.target.value })}
-          className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="tags" className="mb-1 block text-sm font-medium">
+        <label htmlFor="tags" className={labelClassName}>
           Tags (comma separated)
         </label>
         <input
           id="tags"
           value={form.tags}
           onChange={(e) => setForm({ ...form, tags: e.target.value })}
-          className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
+          className={fieldClassName}
         />
       </div>
 
-      <label className="flex items-center gap-2 text-sm">
+      <label className="flex items-center gap-2 text-sm font-medium">
         <input
           type="checkbox"
           checked={form.favorite}
           onChange={(e) => setForm({ ...form, favorite: e.target.checked })}
+          className="accent-[var(--accent)]"
         />
         Favorite
       </label>
 
       {error && (
-        <p className="text-sm text-red-600 dark:text-red-400" role="alert">
+        <p className="text-sm text-accent" role="alert">
           {error}
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={busy}
-        aria-busy={busy}
-        className="rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background disabled:opacity-50"
-      >
+      <Button type="submit" disabled={busy} aria-busy={busy}>
         {busy ? "Saving…" : initial ? "Save changes" : "Save recipe"}
-      </button>
+      </Button>
     </form>
   );
 }

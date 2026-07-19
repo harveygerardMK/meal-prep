@@ -3,6 +3,14 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { CatalogRecipe, MealKind } from "@/lib/types";
+import {
+  AppHeader,
+  CardActionButton,
+  LinkButton,
+  RecipeCard,
+  SiteNav,
+  cn,
+} from "../components/brand";
 
 export default function RecipesPage() {
   const [recipes, setRecipes] = useState<CatalogRecipe[]>([]);
@@ -68,94 +76,92 @@ export default function RecipesPage() {
     );
   }
 
+  const kindLabel = (kind: MealKind) => kind.replace("_", " ");
+
   return (
-    <main className="mx-auto w-full max-w-3xl px-6 py-10">
-      <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Recipe catalog</h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+    <>
+      <AppHeader
+        nav={<SiteNav active="recipes" />}
+        actions={
+          <LinkButton href="/recipes/new">Add recipe</LinkButton>
+        }
+      />
+      <main className="mx-auto w-full max-w-6xl px-6 py-10">
+        <div className="mb-8">
+          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-accent">
+            Catalog
+          </p>
+          <h1 className="font-serif text-4xl font-semibold tracking-tight">
+            Recipe catalog
+          </h1>
+          <p className="mt-2 text-sm text-muted">
             Add, edit, favorite, and archive household recipes.
           </p>
         </div>
-        <div className="flex gap-2">
-          <Link
-            href="/"
-            className="rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-900"
-          >
-            Plan
-          </Link>
-          <Link
-            href="/recipes/new"
-            className="rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background"
-          >
-            Add recipe
-          </Link>
+
+        <div className="mb-8 flex flex-wrap gap-2">
+          {(
+            [
+              ["all", "Active"],
+              ["dinner", "Dinners"],
+              ["girl_lunch", "Girl lunches"],
+              ["boy_lunch", "Boy lunches"],
+              ["favorites", "Favorites"],
+              ["archived", "Archived"],
+            ] as const
+          ).map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setFilter(value)}
+              className={cn(
+                "rounded px-3 py-1.5 text-xs font-semibold transition-colors duration-150",
+                filter === value
+                  ? "bg-accent text-accent-foreground"
+                  : "border border-border text-muted hover:text-foreground"
+              )}
+            >
+              {label}
+            </button>
+          ))}
         </div>
-      </div>
 
-      <div className="mb-6 flex flex-wrap gap-2">
-        {(
-          [
-            ["all", "Active"],
-            ["dinner", "Dinners"],
-            ["girl_lunch", "Girl lunches"],
-            ["boy_lunch", "Boy lunches"],
-            ["favorites", "Favorites"],
-            ["archived", "Archived"],
-          ] as const
-        ).map(([value, label]) => (
-          <button
-            key={value}
-            type="button"
-            onClick={() => setFilter(value)}
-            className={`rounded-full px-3 py-1 text-xs font-medium ${
-              filter === value
-                ? "bg-foreground text-background"
-                : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+        {error && (
+          <p className="mb-4 text-sm text-accent" role="alert">
+            {error}
+          </p>
+        )}
 
-      {error && (
-        <p className="mb-4 text-sm text-red-600 dark:text-red-400" role="alert">
-          {error}
-        </p>
-      )}
-
-      <ul className="space-y-3">
-        {visible.map((recipe) => (
-          <li
-            key={recipe.id}
-            className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
-          >
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-wide text-zinc-400">
-                  {recipe.kind.replace("_", " ")}
-                  {recipe.status === "archived" ? " · archived" : ""}
-                  {recipe.favorite ? " · favorite" : ""}
-                </p>
-                <h2 className="text-lg font-semibold">{recipe.name}</h2>
-                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                  {recipe.kind === "dinner"
-                    ? `${recipe.cookMinutes ?? "?"} min · ${recipe.protein ?? "protein n/a"}`
-                    : `${recipe.ingredients.length} ingredients`}
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {visible.map((recipe) => (
+            <RecipeCard
+              key={recipe.id}
+              name={recipe.name}
+              eyebrow={`${kindLabel(recipe.kind)}${
+                recipe.status === "archived" ? " · archived" : ""
+              }`}
+              meta={
+                recipe.kind === "dinner"
+                  ? [
+                      `${recipe.cookMinutes ?? "?"} min`,
+                      recipe.protein,
+                      ...recipe.tags.slice(0, 2),
+                    ]
+                  : [`${recipe.ingredients.length} ingredients`, ...recipe.tags.slice(0, 2)]
+              }
+              action={
+                <CardActionButton
+                  active={recipe.favorite}
                   onClick={() => toggleFavorite(recipe)}
-                  className="rounded-full border border-zinc-200 px-3 py-1 text-xs font-medium dark:border-zinc-700"
-                >
-                  {recipe.favorite ? "Unfavorite" : "Favorite"}
-                </button>
+                  activeLabel="Favorited"
+                  inactiveLabel="Favorite"
+                />
+              }
+            >
+              <div className="flex flex-wrap gap-2">
                 <Link
                   href={`/recipes/${recipe.id}`}
-                  className="rounded-full border border-zinc-200 px-3 py-1 text-xs font-medium dark:border-zinc-700"
+                  className="text-sm font-semibold text-foreground underline-offset-2 hover:underline"
                 >
                   Edit
                 </Link>
@@ -163,20 +169,20 @@ export default function RecipesPage() {
                   <button
                     type="button"
                     onClick={() => archive(recipe)}
-                    className="rounded-full border border-zinc-200 px-3 py-1 text-xs font-medium dark:border-zinc-700"
+                    className="text-sm font-semibold text-muted hover:text-foreground"
                   >
                     Archive
                   </button>
                 )}
               </div>
-            </div>
-          </li>
-        ))}
-      </ul>
+            </RecipeCard>
+          ))}
+        </div>
 
-      {visible.length === 0 && (
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">No recipes in this filter.</p>
-      )}
-    </main>
+        {visible.length === 0 && (
+          <p className="text-sm text-muted">No recipes in this filter.</p>
+        )}
+      </main>
+    </>
   );
 }

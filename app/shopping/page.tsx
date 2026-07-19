@@ -1,8 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import type { ShoppingHandoff } from "@/lib/shopping/handoff";
+import {
+  AppHeader,
+  Button,
+  LinkButton,
+  SiteNav,
+} from "../components/brand";
 
 type ShoppingResponse = {
   weekOf: string;
@@ -34,85 +39,85 @@ export default function ShoppingPage() {
     setTimeout(() => setCopied(false), 2000);
   }
 
-  if (error) {
-    return (
-      <main className="mx-auto max-w-3xl px-6 py-16 text-center text-red-600" role="alert">
-        {error}
-      </main>
-    );
-  }
-
-  if (!data) {
-    return (
-      <main className="mx-auto max-w-3xl px-6 py-16 text-center text-zinc-500">
-        Building shopping handoff…
-      </main>
-    );
-  }
-
   return (
-    <main className="mx-auto w-full max-w-3xl px-6 py-10">
-      <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Shopping handoff</h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Week of {data.weekOf} · mode {data.handoff.mode}
+    <>
+      <AppHeader
+        nav={<SiteNav active="shopping" />}
+        actions={
+          data ? (
+            <Button type="button" onClick={copyExport}>
+              {copied ? "Copied" : "Copy list"}
+            </Button>
+          ) : null
+        }
+      />
+      <main className="mx-auto w-full max-w-6xl px-6 py-10">
+        {error ? (
+          <p className="text-center text-accent" role="alert">
+            {error}
           </p>
-        </div>
-        <div className="flex gap-2">
-          <Link
-            href="/"
-            className="rounded-full border border-zinc-200 px-4 py-2 text-sm font-medium dark:border-zinc-800"
-          >
-            Plan
-          </Link>
-          <button
-            type="button"
-            onClick={copyExport}
-            className="rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background"
-          >
-            {copied ? "Copied" : "Copy list"}
-          </button>
-        </div>
-      </div>
+        ) : !data ? (
+          <p className="text-center text-muted">Building shopping handoff…</p>
+        ) : (
+          <>
+            <div className="mb-8">
+              <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-accent">
+                Shopping
+              </p>
+              <h1 className="font-serif text-4xl font-semibold tracking-tight">
+                Shopping handoff
+              </h1>
+              <p className="mt-2 text-sm text-muted">
+                Week of {data.weekOf} · mode {data.handoff.mode}
+              </p>
+            </div>
 
-      <p className="mb-6 text-sm text-zinc-600 dark:text-zinc-300">{data.handoff.note}</p>
+            <p className="mb-6 text-sm text-muted">{data.handoff.note}</p>
 
-      {data.instacartLandingUrl && (
-        <a
-          href={data.instacartLandingUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="mb-6 inline-block rounded-full bg-emerald-700 px-4 py-2 text-sm font-medium text-white"
-        >
-          Open Instacart cart page
-        </a>
-      )}
-
-      <ul className="space-y-3">
-        {data.handoff.items.map((item) => (
-          <li
-            key={`${item.section}-${item.name}`}
-            className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
-          >
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-wide text-zinc-400">{item.section}</p>
-                <h2 className="font-semibold">{item.name}</h2>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">{item.details}</p>
-              </div>
+            {data.instacartLandingUrl && (
               <a
-                href={item.instacartSearchUrl}
+                href={data.instacartLandingUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="shrink-0 rounded-full border border-zinc-200 px-3 py-1 text-xs font-medium dark:border-zinc-700"
+                className="mb-8 inline-flex items-center justify-center rounded bg-success px-[18px] py-2.5 text-sm font-semibold text-white transition-colors hover:opacity-90"
               >
-                Instacart search
+                Open Instacart cart page
               </a>
+            )}
+
+            <ul className="divide-y divide-border border-t border-border">
+              {data.handoff.items.map((item) => (
+                <li
+                  key={`${item.section}-${item.name}`}
+                  className="flex flex-col gap-2 py-4 sm:flex-row sm:items-start sm:justify-between"
+                >
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.06em] text-meta">
+                      {item.section}
+                    </p>
+                    <h2 className="font-serif text-xl font-semibold">{item.name}</h2>
+                    <p className="mt-1 text-sm text-meta">{item.details}</p>
+                  </div>
+                  <a
+                    href={item.instacartSearchUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="shrink-0 text-sm font-semibold text-accent underline-offset-2 hover:underline"
+                  >
+                    Instacart search
+                  </a>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-8">
+              <LinkButton href="/" variant="secondary">
+                Back to plan
+              </LinkButton>
             </div>
-          </li>
-        ))}
-      </ul>
-    </main>
+          </>
+        )}
+      </main>
+    </>
   );
 }

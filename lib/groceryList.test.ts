@@ -26,6 +26,7 @@ function planFixture(overrides: Partial<ResolvedWeekPlan> = {}): ResolvedWeekPla
       ingredients: ["Peanut butter", "Sandwich bread"],
     },
     locks: { dinners: [null], girlLunch: null, boyLunch: null },
+    preferences: { cookEffortTarget: 3, noveltyTarget: 3 },
     ...overrides,
   };
 }

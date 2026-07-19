@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button, fieldClassName, labelClassName } from "../components/brand";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -34,13 +35,16 @@ export default function LoginPage() {
 
   return (
     <main className="mx-auto flex min-h-full w-full max-w-sm flex-col justify-center px-6 py-16">
-      <h1 className="text-2xl font-bold">Household login</h1>
-      <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+      <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.06em] text-accent">
+        Meal Prep
+      </p>
+      <h1 className="font-serif text-4xl font-semibold tracking-tight">Household login</h1>
+      <p className="mt-2 text-sm text-muted">
         Shared password for this private meal-prep app.
       </p>
-      <form onSubmit={onSubmit} className="mt-8 space-y-4">
+      <form onSubmit={onSubmit} className="mt-8 space-y-5">
         <div>
-          <label htmlFor="password" className="mb-1 block text-sm font-medium">
+          <label htmlFor="password" className={labelClassName}>
             Password
           </label>
           <input
@@ -51,22 +55,22 @@ export default function LoginPage() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-800 dark:bg-zinc-900"
+            className={fieldClassName}
           />
         </div>
         {error && (
-          <p className="text-sm text-red-600 dark:text-red-400" role="alert">
+          <p className="text-sm text-accent" role="alert">
             {error}
           </p>
         )}
-        <button
+        <Button
           type="submit"
           disabled={busy}
           aria-busy={busy}
-          className="w-full rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background disabled:opacity-50"
+          className="w-full"
         >
           {busy ? "Signing in…" : "Sign in"}
-        </button>
+        </Button>
       </form>
     </main>
   );
