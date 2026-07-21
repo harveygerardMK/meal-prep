@@ -96,11 +96,18 @@ function recentLunchIds(
   return ids;
 }
 
-function emptyLocks(dinnersPerWeek: number): Locks {
+/** Carry last week's lunches forward as locks so new weeks keep stable lunch picks. */
+function lunchLocksFromPreviousWeek(
+  history: History,
+  weekOf: string
+): Pick<Locks, "girlLunch" | "boyLunch"> {
+  const previous = recentWeeks(history, weekOf, 1)[0];
+  if (!previous) {
+    return { girlLunch: null, boyLunch: null };
+  }
   return {
-    dinners: Array(dinnersPerWeek).fill(null),
-    girlLunch: null,
-    boyLunch: null,
+    girlLunch: previous.girlLunch,
+    boyLunch: previous.boyLunch,
   };
 }
 
@@ -207,12 +214,19 @@ async function buildPlan(
   const girlLunch = pickLunch(recipes.girlLunches, avoidGirl, locks.girlLunch);
   const boyLunch = pickLunch(recipes.boyLunches, avoidBoy, locks.boyLunch);
 
+  // Lunches stay locked after every pick; unlock is only a one-shot regenerate signal.
+  const persistedLocks: Locks = {
+    ...locks,
+    girlLunch,
+    boyLunch,
+  };
+
   const plan = clearConfirmation({
     weekOf,
     dinners,
     girlLunch,
     boyLunch,
-    locks,
+    locks: persistedLocks,
     preferences,
     // Keep household extras across regenerate / rebuild.
     miscGrocery: existingWeek?.miscGrocery ?? [],
@@ -303,14 +317,19 @@ export async function ensureCurrentPlan(
   if (existing) {
     return resolvePlan(existing);
   }
-  const settings = await getSettings();
+  const [settings, history] = await Promise.all([getSettings(), getHistory()]);
   const prefs = preferences ?? {
     cookEffortTarget: settings.cookEffortTarget,
     noveltyTarget: settings.noveltyTarget,
   };
+  const lunchLocks = lunchLocksFromPreviousWeek(history, weekOf);
   const plan = await buildPlan(
     weekOf,
-    emptyLocks(settings.dinnersPerWeek),
+    {
+      dinners: Array(settings.dinnersPerWeek).fill(null),
+      girlLunch: lunchLocks.girlLunch,
+      boyLunch: lunchLocks.boyLunch,
+    },
     prefs
   );
   return resolvePlan(plan);

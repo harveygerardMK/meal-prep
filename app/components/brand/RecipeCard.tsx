@@ -11,6 +11,7 @@ export function RecipeCard({
   action,
   children,
   className,
+  emphasized = false,
 }: {
   name: string;
   eyebrow?: string;
@@ -19,12 +20,15 @@ export function RecipeCard({
   action?: ReactNode;
   children?: ReactNode;
   className?: string;
+  emphasized?: boolean;
 }) {
   return (
     <article
       className={cn(
-        "group bg-card",
-        imageUrl ? "" : "border-t border-border pt-4",
+        "group",
+        emphasized
+          ? "rounded-lg border border-accent/20 bg-accent-soft p-5"
+          : cn("bg-card", imageUrl ? "" : "border-t border-border pt-4"),
         className
       )}
     >

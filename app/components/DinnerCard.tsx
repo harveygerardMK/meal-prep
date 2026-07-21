@@ -2,7 +2,7 @@
 
 import { type FormEvent, useState } from "react";
 import type { Dinner } from "@/lib/types";
-import { CardActionButton, RecipeCard, cn } from "./brand";
+import { CardActionButton, RecipeCard } from "./brand";
 
 export function DinnerCard({
   dinner,
@@ -56,7 +56,7 @@ export function DinnerCard({
         dinner.protein,
         ...dinner.tags.slice(0, 3),
       ]}
-      className={cn(emphasized && "ring-1 ring-accent/30")}
+      emphasized={emphasized}
       action={
         <CardActionButton
           active={locked}
