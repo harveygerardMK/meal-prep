@@ -8,6 +8,8 @@
   // version/branch previews. Custom domain alone infers workers_dev=false.
   "workers_dev": true,
   "preview_urls": true,
+  // Preserve dashboard vars when CI runs plain `wrangler versions upload` / `deploy`.
+  "keep_vars": true,
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
