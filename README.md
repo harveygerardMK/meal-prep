@@ -52,6 +52,8 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Cloudflare deploy
 
+### Manual (local Wrangler)
+
 ```bash
 # one-time (already done for this project)
 npx wrangler d1 create meal-prep-db
@@ -64,6 +66,28 @@ npm run deploy
 ```
 
 Custom domain is configured in [`wrangler.jsonc`](wrangler.jsonc) as `meals.wheresharvey.com`.
+
+### Workers Builds (auto-deploy on push to `main`)
+
+Pushing to GitHub does **not** go live until [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/) is connected. One-time setup:
+
+1. Open the Worker’s Builds settings: [meal-prep → Settings → Builds](https://dash.cloudflare.com/2943a10794704030ed749b21d6d39ee8/workers/services/view/meal-prep/production/settings)
+2. Select **Connect**, authorize the **Cloudflare GitHub App** if prompted, and choose repo `harveygerardMK/meal-prep`
+3. Use these build settings:
+
+| Setting | Value |
+|---------|--------|
+| Production branch | `main` |
+| Build command | _(leave empty)_ |
+| Deploy command | `npm run deploy` |
+| Non-production deploy command | `npm run upload` |
+| Root directory | `/` |
+
+4. Save, then push any commit to `main` (or use **Retry build** / trigger from the dashboard) to verify.
+
+`npm run deploy` already runs the OpenNext Cloudflare build (including the `proxy.ts` ↔ `middleware.ts` swap) and then deploys. Deployments use `--keep-vars` so existing Worker secrets are not wiped.
+
+Runtime secrets (`AUTH_SECRET`, `HOUSEHOLD_PASSWORD`, …) stay in **Settings → Variables and Secrets**. Build-time vars (if you add any `NEXT_PUBLIC_*`) go under **Build variables and secrets**.
 
 ## Architecture notes
 

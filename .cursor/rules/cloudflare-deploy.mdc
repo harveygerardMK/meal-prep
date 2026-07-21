@@ -1,0 +1,34 @@
+---
+description: How meal-prep deploys to Cloudflare Workers (Workers Builds + Wrangler)
+alwaysApply: true
+---
+
+# Cloudflare deployment
+
+This app ships to **Cloudflare Workers** (`meal-prep` → https://meals.wheresharvey.com), not Vercel.
+
+## How code goes live
+
+1. **Preferred:** push to `main` → [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/) runs `npm run deploy`.
+2. **Fallback:** from the repo root, run `npm run deploy` (requires Wrangler login).
+
+Git push alone is not enough until Workers Builds is connected to `harveygerardMK/meal-prep`.
+
+## After shipping user-facing changes
+
+When the user asks to commit/push **or** expects production to update:
+
+1. Push to `origin/main` if needed.
+2. Confirm a Workers Build started (Cloudflare Builds MCP: set active worker `meal-prep` / id `271c613b6dfa4ca79841dcc92f92c418`, then list builds).
+3. If Builds is not connected or no build appears, run `npm run deploy` and tell the user why.
+
+## Build settings (dashboard)
+
+| Setting | Value |
+|---------|--------|
+| Deploy command | `npm run deploy` |
+| Build command | empty |
+| Non-production | `npm run upload` |
+| Production branch | `main` |
+
+Do not use plain `npx wrangler deploy` as the Builds deploy command — this project needs `scripts/cloudflare-build.mjs` (OpenNext + proxy/middleware swap). Deployments must keep `--keep-vars` (already wired in that script).

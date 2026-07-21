@@ -91,11 +91,16 @@ try {
   swapped = true;
 
   for (const step of steps) {
-    const result = spawnSync(
-      "npx",
-      ["opennextjs-cloudflare", step],
-      { cwd: root, stdio: "inherit", shell: process.platform === "win32" }
-    );
+    // Keep dashboard secrets (AUTH_SECRET, etc.) across CI / Workers Builds deploys.
+    const args =
+      step === "deploy" || step === "upload"
+        ? ["opennextjs-cloudflare", step, "--", "--keep-vars"]
+        : ["opennextjs-cloudflare", step];
+    const result = spawnSync("npx", args, {
+      cwd: root,
+      stdio: "inherit",
+      shell: process.platform === "win32",
+    });
     if (result.status !== 0) {
       cleanup();
       process.exit(result.status ?? 1);
