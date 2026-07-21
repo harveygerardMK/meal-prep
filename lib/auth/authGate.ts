@@ -17,7 +17,16 @@ export async function authGate(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isLoginPage = pathname === "/login";
   const isLoginApi = pathname === "/api/auth/login";
-  const isPublic = isLoginPage || isLoginApi;
+  // Home Screen / PWA icon probes must work without a session cookie.
+  const isPublicIcon =
+    pathname === "/favicon.ico" ||
+    pathname === "/icon" ||
+    pathname.startsWith("/icon/") ||
+    pathname === "/apple-icon" ||
+    pathname.startsWith("/apple-icon/") ||
+    pathname.startsWith("/apple-touch-icon") ||
+    pathname === "/oven-mitt-icon.png";
+  const isPublic = isLoginPage || isLoginApi || isPublicIcon;
 
   const token = request.cookies.get(getSessionCookieName())?.value;
   let session = null;
