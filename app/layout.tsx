@@ -21,6 +21,16 @@ const sourceSerif = Source_Serif_4({
 export const metadata: Metadata = {
   title: "Meal Prep",
   description: "Weekly dinner plan, kid lunches, and grocery list",
+  icons: {
+    icon: [{ url: "/oven-mitt-icon.png", type: "image/png" }],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
+  appleWebApp: {
+    capable: true,
+    title: "Meal Prep",
+  },
 };
 
 export default function RootLayout({
