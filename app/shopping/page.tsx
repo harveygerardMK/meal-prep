@@ -92,8 +92,8 @@ export default function ShoppingPage() {
       )}
 
       <p className="mb-8 text-sm text-muted">
-        Check off as you shop. Add extras any day this week. Each item also has Instacart and Google
-        search links if you want delivery help.
+        Check off as you shop. Add extras to Regular grocery, Amazon, or Costco. Each item also has
+        Instacart and Google search links if you want delivery help.
       </p>
 
       {data.instacartLandingUrl && (

@@ -1,3 +1,8 @@
+import {
+  MISC_DESTINATION_SECTIONS,
+  type MiscGrocerySection,
+} from "./types";
+
 export function parseMiscGroceryName(input: unknown): string {
   if (typeof input !== "string") {
     throw new Error("Invalid name: expected a string");
@@ -19,4 +24,19 @@ export function parseMiscGroceryNote(input: unknown): string | undefined {
     throw new Error("Invalid note: use at most 120 characters");
   }
   return note || undefined;
+}
+
+export function parseMiscGrocerySection(input: unknown): MiscGrocerySection {
+  if (input === undefined || input === null || input === "") {
+    return "Miscellaneous";
+  }
+  if (
+    typeof input !== "string" ||
+    !(MISC_DESTINATION_SECTIONS as readonly string[]).includes(input)
+  ) {
+    throw new Error(
+      "Invalid section: use Miscellaneous, Amazon, or Costco"
+    );
+  }
+  return input as MiscGrocerySection;
 }

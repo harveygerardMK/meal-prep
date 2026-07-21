@@ -16,6 +16,8 @@ export type GroceryListOptions = {
 };
 
 export const MISC_SECTION = "Miscellaneous";
+export const AMAZON_SECTION = "Amazon";
+export const COSTCO_SECTION = "Costco";
 
 const SECTION_ORDER = [
   "Produce",
@@ -25,8 +27,13 @@ const SECTION_ORDER = [
   "Frozen",
   "Pantry & Dry Goods",
   "Other",
+  AMAZON_SECTION,
+  COSTCO_SECTION,
   MISC_SECTION,
 ] as const;
+
+/** Always shown on the grocery list so store-destination shopping is visible. */
+const ALWAYS_SECTIONS = [AMAZON_SECTION, COSTCO_SECTION] as const;
 
 const SECTION_KEYWORDS: [string, RegExp][] = [
   [
@@ -120,8 +127,9 @@ export function buildGroceryList(
     items.sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  if (plan.miscGrocery.length > 0) {
-    const miscItems: GroceryItem[] = plan.miscGrocery.map((item) => ({
+  for (const item of plan.miscGrocery) {
+    const section = item.section ?? MISC_SECTION;
+    const groceryItem: GroceryItem = {
       name: item.name,
       checkKey: `misc:${item.id}`,
       miscId: item.id,
@@ -131,8 +139,13 @@ export function buildGroceryList(
           source: "Added this week",
         },
       ],
-    }));
-    bySection.set(MISC_SECTION, miscItems);
+    };
+    if (!bySection.has(section)) bySection.set(section, []);
+    bySection.get(section)!.push(groceryItem);
+  }
+
+  for (const section of ALWAYS_SECTIONS) {
+    if (!bySection.has(section)) bySection.set(section, []);
   }
 
   return SECTION_ORDER.filter((s) => bySection.has(s)).map((section) => ({

@@ -4,12 +4,17 @@ import { randomUUID } from "crypto";
 import { getWeekPlan, upsertWeekPlan } from "./dataStore";
 import { weekStartISO } from "./week";
 import { PlanNotFoundError } from "./planGenerator";
-import { parseMiscGroceryName, parseMiscGroceryNote } from "./miscGroceryParse";
+import {
+  parseMiscGroceryName,
+  parseMiscGroceryNote,
+  parseMiscGrocerySection,
+} from "./miscGroceryParse";
 import type { MiscGroceryItem } from "./types";
 
 export async function addMiscGroceryItem(input: {
   name: unknown;
   note?: unknown;
+  section?: unknown;
 }): Promise<MiscGroceryItem[]> {
   const weekOf = weekStartISO();
   const plan = await getWeekPlan(weekOf);
@@ -19,6 +24,7 @@ export async function addMiscGroceryItem(input: {
     id: randomUUID(),
     name: parseMiscGroceryName(input.name),
     note: parseMiscGroceryNote(input.note),
+    section: parseMiscGrocerySection(input.section),
     addedAt: new Date().toISOString(),
   };
 

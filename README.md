@@ -78,14 +78,16 @@ Pushing to GitHub does **not** go live until [Workers Builds](https://developers
 | Setting | Value |
 |---------|--------|
 | Production branch | `main` |
-| Build command | _(leave empty)_ |
+| Build command | `npm run build` |
 | Deploy command | `npm run deploy` |
 | Non-production deploy command | `npm run upload` |
 | Root directory | `/` |
 
+`npm run build` produces the OpenNext Worker bundle (`.open-next/worker.js`). Do **not** set the build command to plain `next build` — Wrangler will then fail with “entry-point file at `.open-next/worker.js` was not found.”
+
 4. Save, then push any commit to `main` (or use **Retry build** / trigger from the dashboard) to verify.
 
-`npm run deploy` already runs the OpenNext Cloudflare build (including the `proxy.ts` ↔ `middleware.ts` swap) and then deploys. Deployments use `--keep-vars` so existing Worker secrets are not wiped.
+`npm run deploy` / `npm run upload` rebuild and ship with secret-safe defaults (`keep_vars` in `wrangler.jsonc`).
 
 Runtime secrets (`AUTH_SECRET`, `HOUSEHOLD_PASSWORD`, …) stay in **Settings → Variables and Secrets**. Build-time vars (if you add any `NEXT_PUBLIC_*`) go under **Build variables and secrets**.
 

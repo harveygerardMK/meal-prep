@@ -6,16 +6,7 @@ import type {
   StaplesData,
   WeekPreferences,
 } from "./types";
-
-const GROCERY_SECTIONS: GrocerySectionName[] = [
-  "Produce",
-  "Meat & Seafood",
-  "Dairy & Eggs",
-  "Bakery & Bread",
-  "Frozen",
-  "Pantry & Dry Goods",
-  "Other",
-];
+import { GROCERY_SECTION_NAMES } from "./types";
 
 function requirePositiveInt(value: unknown, field: string): number {
   if (typeof value !== "number" || !Number.isInteger(value) || value < 1) {
@@ -89,7 +80,7 @@ export function parseStaples(input: unknown): StaplesData {
       const section = staple.section;
       if (
         typeof section !== "string" ||
-        !GROCERY_SECTIONS.includes(section as GrocerySectionName)
+        !(GROCERY_SECTION_NAMES as readonly string[]).includes(section)
       ) {
         throw new Error(`Invalid staple at index ${index}: unknown section`);
       }

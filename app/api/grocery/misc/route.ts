@@ -33,7 +33,11 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    await addMiscGroceryItem({ name: body?.name, note: body?.note });
+    await addMiscGroceryItem({
+      name: body?.name,
+      note: body?.note,
+      section: body?.section,
+    });
     return NextResponse.json(await groceryPayload());
   } catch (error) {
     return errorResponse(error);

@@ -4,6 +4,12 @@
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-06-05",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  // Keep workers.dev + preview URLs on so Workers Builds PR uploads can publish
+  // version/branch previews. Custom domain alone infers workers_dev=false.
+  "workers_dev": true,
+  "preview_urls": true,
+  // Preserve dashboard vars when CI runs plain `wrangler versions upload` / `deploy`.
+  "keep_vars": true,
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
@@ -22,9 +28,6 @@
       "migrations_dir": "migrations"
     }
   ],
-  "images": {
-    "binding": "IMAGES"
-  },
   "routes": [
     {
       "pattern": "meals.wheresharvey.com",

@@ -85,14 +85,27 @@ export type Settings = {
   includeStaplesInGroceryList: boolean;
 };
 
-export type GrocerySectionName =
-  | "Produce"
-  | "Meat & Seafood"
-  | "Dairy & Eggs"
-  | "Bakery & Bread"
-  | "Frozen"
-  | "Pantry & Dry Goods"
-  | "Other";
+export const GROCERY_SECTION_NAMES = [
+  "Produce",
+  "Meat & Seafood",
+  "Dairy & Eggs",
+  "Bakery & Bread",
+  "Frozen",
+  "Pantry & Dry Goods",
+  "Other",
+  "Amazon",
+  "Costco",
+] as const;
+
+export type GrocerySectionName = (typeof GROCERY_SECTION_NAMES)[number];
+
+export const MISC_DESTINATION_SECTIONS = [
+  "Miscellaneous",
+  "Amazon",
+  "Costco",
+] as const;
+
+export type MiscGrocerySection = (typeof MISC_DESTINATION_SECTIONS)[number];
 
 export type StapleItem = {
   id: string;
@@ -139,6 +152,8 @@ export type MiscGroceryItem = {
   id: string;
   name: string;
   note?: string;
+  /** Where to shop for this add-on; defaults to Miscellaneous. */
+  section?: MiscGrocerySection;
   addedAt: string;
 };
 

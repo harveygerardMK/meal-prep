@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { GrocerySectionName, Settings, StapleItem } from "@/lib/types";
+import {
+  GROCERY_SECTION_NAMES,
+  type GrocerySectionName,
+  type Settings,
+  type StapleItem,
+} from "@/lib/types";
 import {
   Button,
   LinkButton,
@@ -146,15 +151,7 @@ export default function SettingsPage() {
       hint: "Default weekly slider for repeats vs trying something different.",
     },
   ];
-  const grocerySections: GrocerySectionName[] = [
-    "Produce",
-    "Meat & Seafood",
-    "Dairy & Eggs",
-    "Bakery & Bread",
-    "Frozen",
-    "Pantry & Dry Goods",
-    "Other",
-  ];
+  const grocerySections = GROCERY_SECTION_NAMES;
 
   function updateStaple(id: string, changes: Partial<StapleItem>) {
     setStaples(staples.map((staple) => (staple.id === id ? { ...staple, ...changes } : staple)));

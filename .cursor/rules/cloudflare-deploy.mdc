@@ -26,9 +26,9 @@ When the user asks to commit/push **or** expects production to update:
 
 | Setting | Value |
 |---------|--------|
-| Deploy command | `npm run deploy` |
-| Build command | empty |
-| Non-production | `npm run upload` |
 | Production branch | `main` |
+| Build command | `npm run build` |
+| Deploy command | `npm run deploy` (or `npx wrangler deploy`) |
+| Non-production | `npm run upload` (or `npx wrangler versions upload`) |
 
-Do not use plain `npx wrangler deploy` as the Builds deploy command — this project needs `scripts/cloudflare-build.mjs` (OpenNext + proxy/middleware swap). Deployments must keep `--keep-vars` (already wired in that script).
+`npm run build` runs `scripts/cloudflare-build.mjs` (OpenNext + proxy/middleware swap) and writes `.open-next/worker.js`. Plain `next build` alone is not enough for Workers Builds. `keep_vars` is set in `wrangler.jsonc` so dashboard vars survive Wrangler uploads.

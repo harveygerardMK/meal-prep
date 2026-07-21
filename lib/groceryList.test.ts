@@ -100,6 +100,59 @@ describe("buildGroceryList", () => {
     expect(misc?.items[0]?.checkKey).toBe("misc:misc-1");
   });
 
+  it("always includes empty Amazon and Costco sections", () => {
+    const sections = buildGroceryList(planFixture());
+    const names = sections.map((s) => s.section);
+    expect(names).toContain("Amazon");
+    expect(names).toContain("Costco");
+    expect(sections.find((s) => s.section === "Amazon")?.items).toEqual([]);
+    expect(sections.find((s) => s.section === "Costco")?.items).toEqual([]);
+  });
+
+  it("routes misc items into Amazon and Costco when chosen", () => {
+    const sections = buildGroceryList(
+      planFixture({
+        miscGrocery: [
+          {
+            id: "a1",
+            name: "Vitamins",
+            section: "Amazon",
+            addedAt: "2026-07-15T12:00:00.000Z",
+          },
+          {
+            id: "c1",
+            name: "Paper towels",
+            section: "Costco",
+            addedAt: "2026-07-15T12:00:00.000Z",
+          },
+        ],
+      })
+    );
+    expect(sections.find((s) => s.section === "Amazon")?.items[0]?.name).toBe(
+      "Vitamins"
+    );
+    expect(sections.find((s) => s.section === "Costco")?.items[0]?.name).toBe(
+      "Paper towels"
+    );
+    expect(sections.find((s) => s.section === "Miscellaneous")).toBeUndefined();
+  });
+
+  it("places staples into Amazon and Costco sections", () => {
+    const sections = buildGroceryList(planFixture(), {
+      includeStaples: true,
+      staples: [
+        { id: "s1", name: "Trash bags", section: "Amazon" },
+        { id: "s2", name: "Olive oil", section: "Costco" },
+      ],
+    });
+    expect(sections.find((s) => s.section === "Amazon")?.items.some((i) => i.name === "Trash bags")).toBe(
+      true
+    );
+    expect(sections.find((s) => s.section === "Costco")?.items.some((i) => i.name === "Olive oil")).toBe(
+      true
+    );
+  });
+
   it("merges staples into store sections when enabled", () => {
     const sections = buildGroceryList(planFixture(), {
       includeStaples: true,

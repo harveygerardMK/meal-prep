@@ -26,8 +26,3 @@ interface D1Database {
 interface Fetcher {
   fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
 }
-
-interface ImagesBinding {
-  // Unused in app code; present for wrangler binding typing.
-  info(stream: ReadableStream | string): Promise<unknown>;
-}
