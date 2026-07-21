@@ -41,6 +41,7 @@ export function buildShoppingHandoff(
   }
 
   const exportText = sections
+    .filter((section) => section.items.length > 0)
     .map((section) => {
       const lines = section.items.map(
         (item) => `- ${item.name}: ${item.entries.map((e) => e.text).join("; ")}`

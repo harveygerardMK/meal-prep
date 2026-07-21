@@ -112,42 +112,46 @@ export function GroceryListView({
             <h3 className="mb-3 text-sm font-semibold text-foreground">
               {section.section}
             </h3>
-            <ul className="space-y-3 text-sm">
-              {section.items.map((item) => {
-                const key = itemCheckKey(item);
-                const isChecked = checked.has(key);
-                return (
-                  <li key={key} className="flex items-start gap-2">
-                    <label className="flex min-h-11 flex-1 cursor-pointer items-start gap-3 py-1">
-                      <input
-                        type="checkbox"
-                        className="mt-1 h-4 w-4 accent-[var(--accent)]"
-                        checked={isChecked}
-                        onChange={() => toggleGroceryChecked(weekOf, key, checked)}
-                      />
-                      <span className={isChecked ? "opacity-60 line-through" : undefined}>
-                        <span className="font-medium capitalize text-foreground">
-                          {item.name}
+            {section.items.length === 0 ? (
+              <p className="text-sm text-meta">Nothing yet — add above with Buy at.</p>
+            ) : (
+              <ul className="space-y-3 text-sm">
+                {section.items.map((item) => {
+                  const key = itemCheckKey(item);
+                  const isChecked = checked.has(key);
+                  return (
+                    <li key={key} className="flex items-start gap-2">
+                      <label className="flex min-h-11 flex-1 cursor-pointer items-start gap-3 py-1">
+                        <input
+                          type="checkbox"
+                          className="mt-1 h-4 w-4 accent-[var(--accent)]"
+                          checked={isChecked}
+                          onChange={() => toggleGroceryChecked(weekOf, key, checked)}
+                        />
+                        <span className={isChecked ? "opacity-60 line-through" : undefined}>
+                          <span className="font-medium capitalize text-foreground">
+                            {item.name}
+                          </span>
+                          <span className="mt-0.5 block text-[13px] text-meta">
+                            {item.entries.map((e) => e.text).join("; ")}
+                          </span>
                         </span>
-                        <span className="mt-0.5 block text-[13px] text-meta">
-                          {item.entries.map((e) => e.text).join("; ")}
-                        </span>
-                      </span>
-                    </label>
-                    {item.miscId && (
-                      <button
-                        type="button"
-                        onClick={() => removeMisc(item.miscId!)}
-                        disabled={removingId === item.miscId}
-                        className="min-h-11 shrink-0 px-2 text-sm font-semibold text-muted underline-offset-2 hover:text-foreground hover:underline disabled:opacity-50"
-                      >
-                        {removingId === item.miscId ? "…" : "Remove"}
-                      </button>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
+                      </label>
+                      {item.miscId && (
+                        <button
+                          type="button"
+                          onClick={() => removeMisc(item.miscId!)}
+                          disabled={removingId === item.miscId}
+                          className="min-h-11 shrink-0 px-2 text-sm font-semibold text-muted underline-offset-2 hover:text-foreground hover:underline disabled:opacity-50"
+                        >
+                          {removingId === item.miscId ? "…" : "Remove"}
+                        </button>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
         ))}
       </div>

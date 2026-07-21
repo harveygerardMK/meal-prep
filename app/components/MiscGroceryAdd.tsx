@@ -2,7 +2,11 @@
 
 import { FormEvent, useState } from "react";
 import type { GrocerySection } from "@/lib/groceryList";
-import type { MiscGroceryItem } from "@/lib/types";
+import {
+  MISC_DESTINATION_SECTIONS,
+  type MiscGroceryItem,
+  type MiscGrocerySection,
+} from "@/lib/types";
 import { Button, fieldClassName, labelClassName } from "./brand";
 
 type MiscResponse = {
@@ -18,6 +22,7 @@ export function MiscGroceryAdd({
 }) {
   const [name, setName] = useState("");
   const [note, setNote] = useState("");
+  const [section, setSection] = useState<MiscGrocerySection>("Miscellaneous");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,13 +34,14 @@ export function MiscGroceryAdd({
       const res = await fetch("/api/grocery/misc", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, note: note || undefined }),
+        body: JSON.stringify({ name, note: note || undefined, section }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Could not add item");
       onUpdated(json as MiscResponse);
       setName("");
       setNote("");
+      setSection("Miscellaneous");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not add item");
     } finally {
@@ -58,6 +64,23 @@ export function MiscGroceryAdd({
           placeholder="Paper towels, snacks, dog food…"
           className={fieldClassName}
         />
+      </div>
+      <div>
+        <label htmlFor="misc-section" className={labelClassName}>
+          Buy at
+        </label>
+        <select
+          id="misc-section"
+          value={section}
+          onChange={(e) => setSection(e.target.value as MiscGrocerySection)}
+          className={fieldClassName}
+        >
+          {MISC_DESTINATION_SECTIONS.map((destination) => (
+            <option key={destination} value={destination}>
+              {destination === "Miscellaneous" ? "Regular grocery" : destination}
+            </option>
+          ))}
+        </select>
       </div>
       <div>
         <label htmlFor="misc-note" className={labelClassName}>
