@@ -165,6 +165,55 @@ describe("pickDinners", () => {
     );
     expect(second).not.toEqual(first);
   });
+
+  it("prefers a different protein and tags over another chicken clone for slot 2", () => {
+    vi.spyOn(Math, "random").mockReturnValue(0);
+    const catalog: Dinner[] = [
+      {
+        id: "chicken-soup",
+        name: "Chicken Noodle Soup",
+        protein: "chicken",
+        cookMinutes: 30,
+        tags: ["soup", "favorite"],
+        ingredients: [],
+        effortScore: 3,
+        noveltyScore: 3,
+        seasonCategory: "soup",
+      },
+      {
+        id: "chicken-tacos",
+        name: "Chicken Soft Tacos",
+        protein: "chicken",
+        cookMinutes: 25,
+        tags: ["tacos", "favorite"],
+        ingredients: [],
+        effortScore: 3,
+        noveltyScore: 3,
+        seasonCategory: "tacos",
+      },
+      {
+        id: "beef-stir-fry",
+        name: "Beef Stir Fry",
+        protein: "beef",
+        cookMinutes: 25,
+        tags: ["weeknight"],
+        ingredients: [],
+        effortScore: 3,
+        noveltyScore: 3,
+        seasonCategory: "none",
+      },
+    ];
+    const result = pickDinners(
+      catalog,
+      2,
+      40,
+      new Set(),
+      ["chicken-soup", null],
+      { cookEffortTarget: 3, noveltyTarget: 3 }
+    );
+    expect(result[0]).toBe("chicken-soup");
+    expect(result[1]).toBe("beef-stir-fry");
+  });
 });
 
 describe("pickLunch", () => {

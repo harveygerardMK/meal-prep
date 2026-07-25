@@ -15,6 +15,7 @@ export default function ImportReviewPage() {
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [addToThisWeek, setAddToThisWeek] = useState(false);
 
   useEffect(() => {
     fetch(`/api/imports/${params.id}`)
@@ -56,18 +57,24 @@ export default function ImportReviewPage() {
       const res = await fetch(`/api/imports/${item.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "approve" }),
+        body: JSON.stringify({ action: "approve", addToThisWeek }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Failed to approve import");
       setItem(json.import as RecipeImport);
-      setStatus("Approved and queued for next week.");
+      setStatus(
+        addToThisWeek
+          ? "Saved to recipes and added to this week’s menu."
+          : "Saved to recipes."
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to approve import");
     } finally {
       setBusy(false);
     }
   }
+
+  const alreadySaved = item?.status === "approved" || item?.status === "queued";
 
   return (
     <main className="mx-auto w-full max-w-3xl px-6 py-10">
@@ -90,6 +97,11 @@ export default function ImportReviewPage() {
                 Status: {item.status} · confidence{" "}
                 {(item.draft.confidence * 100).toFixed(0)}%
               </p>
+              {item.draft.ingredients.length === 0 && (
+                <p className="mt-2 text-sm text-accent">
+                  No ingredients were detected yet — paste them below (one per line) before saving.
+                </p>
+              )}
             </div>
 
             {item.error && <p className="mb-4 text-sm text-accent">{item.error}</p>}
@@ -201,6 +213,17 @@ export default function ImportReviewPage() {
                 </div>
               </div>
 
+              <label className="flex items-start gap-3 text-sm text-ink">
+                <input
+                  type="checkbox"
+                  className="mt-1"
+                  checked={addToThisWeek}
+                  onChange={(e) => setAddToThisWeek(e.target.checked)}
+                  disabled={alreadySaved}
+                />
+                <span>Add to this week’s menu after saving</span>
+              </label>
+
               {error && (
                 <p className="text-sm text-accent" role="alert">
                   {error}
@@ -218,10 +241,10 @@ export default function ImportReviewPage() {
                 </Button>
                 <Button
                   type="button"
-                  disabled={busy || item.status === "queued"}
+                  disabled={busy || alreadySaved}
                   onClick={approve}
                 >
-                  Approve for next week
+                  {addToThisWeek ? "Save and add to this week" : "Save to recipes"}
                 </Button>
               </div>
             </form>

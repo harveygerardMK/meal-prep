@@ -18,11 +18,18 @@ function rankDinners(
   dinners: Dinner[],
   preferences: WeekPreferences,
   avoidIds: Set<string>,
-  monthIndex?: number
+  monthIndex: number | undefined,
+  pickedSoFar: Dinner[]
 ): Dinner[] {
   const scored = dinners.map((dinner) => ({
     dinner,
-    score: scoreDinnerCandidate(dinner, preferences, avoidIds, monthIndex),
+    score: scoreDinnerCandidate(
+      dinner,
+      preferences,
+      avoidIds,
+      monthIndex,
+      pickedSoFar
+    ),
   }));
   scored.sort(
     (a, b) => a.score - b.score || a.dinner.id.localeCompare(b.dinner.id)
@@ -37,6 +44,14 @@ function rankDinners(
     i = j;
   }
   return ranked;
+}
+
+function dinnersFromIds(allDinners: Dinner[], ids: string[]): Dinner[] {
+  const byId = new Map(allDinners.map((dinner) => [dinner.id, dinner]));
+  return ids
+    .filter(Boolean)
+    .map((id) => byId.get(id))
+    .filter((dinner): dinner is Dinner => Boolean(dinner));
 }
 
 export function pickDinners(
@@ -78,21 +93,25 @@ export function pickDinners(
   }
 
   const withinTime = allDinners.filter((d) => d.cookMinutes <= maxCookMinutes);
-  const fresh = rankDinners(
-    withinTime.filter((d) => !avoidIds.has(d.id) && !usedIds.has(d.id)),
-    preferences,
-    avoidIds,
-    monthIndex
-  );
-  const fallback = rankDinners(
-    withinTime.filter((d) => !usedIds.has(d.id)),
-    preferences,
-    avoidIds,
-    monthIndex
-  );
 
   for (let i = 0; i < count; i++) {
     if (result[i]) continue;
+
+    const pickedSoFar = dinnersFromIds(allDinners, result);
+    const fresh = rankDinners(
+      withinTime.filter((d) => !avoidIds.has(d.id) && !usedIds.has(d.id)),
+      preferences,
+      avoidIds,
+      monthIndex,
+      pickedSoFar
+    );
+    const fallback = rankDinners(
+      withinTime.filter((d) => !usedIds.has(d.id)),
+      preferences,
+      avoidIds,
+      monthIndex,
+      pickedSoFar
+    );
 
     const choice =
       fresh.find((d) => !usedProteins.has(d.protein)) ??
@@ -105,13 +124,6 @@ export function pickDinners(
     result[i] = choice.id;
     usedProteins.add(choice.protein);
     usedIds.add(choice.id);
-
-    const removeFrom = (list: Dinner[]) => {
-      const idx = list.findIndex((d) => d.id === choice.id);
-      if (idx >= 0) list.splice(idx, 1);
-    };
-    removeFrom(fresh);
-    removeFrom(fallback);
   }
 
   return result;

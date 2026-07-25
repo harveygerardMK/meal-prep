@@ -58,8 +58,8 @@ export default function ImportPage() {
             Import from TikTok
           </h1>
           <p className="mt-2 text-sm text-muted">
-            Paste a link, then add the caption/notes if needed. You always review before it joins
-            next week.
+            Paste a link and the caption if you have it. We turn that into a title and ingredient
+            list for you to review, then save it to your recipes — optionally add it to this week.
           </p>
         </div>
 
@@ -86,7 +86,7 @@ export default function ImportPage() {
               rows={6}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Paste the caption, ingredients, or steps from the video."
+              placeholder="Paste the caption (even as one paragraph). Ingredients will be structured for review."
               className={fieldClassName}
             />
           </div>

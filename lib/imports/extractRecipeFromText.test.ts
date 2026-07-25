@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { extractRecipeFromText } from "./extractRecipeFromText";
+import { extractRecipeFromText, splitProseIngredients } from "./extractRecipeFromText";
 
 describe("extractRecipeFromText", () => {
   it("pulls a title and ingredient-looking lines from a caption", () => {
@@ -28,5 +28,23 @@ Steps:
     });
     expect(draft.confidence).toBeLessThan(0.5);
     expect(draft.missingFields).toContain("ingredients");
+  });
+
+  it("splits an unstructured paragraph with measurements into ingredients", () => {
+    const draft = extractRecipeFromText({
+      titleHint: "Honey Garlic Chicken",
+      text: "You need 1 lb chicken thighs, 3 tbsp honey, 4 cloves garlic and 2 tbsp soy sauce then bake",
+    });
+    expect(draft.ingredients.length).toBeGreaterThanOrEqual(3);
+    expect(draft.ingredients.some((line) => /chicken/i.test(line))).toBe(true);
+    expect(draft.confidence).toBeGreaterThan(0.4);
+  });
+});
+
+describe("splitProseIngredients", () => {
+  it("keeps measurement phrases and drops fluff", () => {
+    expect(
+      splitProseIngredients("1 cup rice, salt to taste and 2 tbsp oil")
+    ).toEqual(expect.arrayContaining(["1 cup rice", "2 tbsp oil"]));
   });
 });

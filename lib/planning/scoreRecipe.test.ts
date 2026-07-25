@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { scoreDinnerCandidate } from "./scoreRecipe";
+import { scoreDinnerCandidate, withinWeekDiversityPenalty } from "./scoreRecipe";
 import type { Dinner } from "@/lib/types";
 
 const dinner = (overrides: Partial<Dinner> & Pick<Dinner, "id">): Dinner => ({
@@ -7,7 +7,7 @@ const dinner = (overrides: Partial<Dinner> & Pick<Dinner, "id">): Dinner => ({
   name: overrides.name ?? overrides.id,
   protein: overrides.protein ?? "chicken",
   cookMinutes: overrides.cookMinutes ?? 25,
-  tags: [],
+  tags: overrides.tags ?? [],
   ingredients: [],
   effortScore: overrides.effortScore ?? 3,
   noveltyScore: overrides.noveltyScore ?? 3,
@@ -61,5 +61,43 @@ describe("scoreDinnerCandidate", () => {
     expect(scoreDinnerCandidate(soup, prefs, new Set(), 10)).toBeLessThan(
       scoreDinnerCandidate(grill, prefs, new Set(), 10)
     );
+  });
+
+  it("penalizes candidates that share protein/tags/name tokens with the week so far", () => {
+    const prefs = { cookEffortTarget: 3, noveltyTarget: 3 };
+    const chickenSoup = dinner({
+      id: "chicken-soup",
+      name: "Chicken Noodle Soup",
+      protein: "chicken",
+      tags: ["soup", "favorite"],
+      seasonCategory: "soup",
+    });
+    const chickenTacos = dinner({
+      id: "chicken-tacos",
+      name: "Chicken Soft Tacos",
+      protein: "chicken",
+      tags: ["tacos", "favorite"],
+      seasonCategory: "tacos",
+    });
+    const beefStirFry = dinner({
+      id: "beef-stir-fry",
+      name: "Beef Stir Fry",
+      protein: "beef",
+      tags: ["weeknight"],
+      seasonCategory: "none",
+    });
+    const picked = [chickenSoup];
+
+    expect(
+      scoreDinnerCandidate(beefStirFry, prefs, new Set(), undefined, picked)
+    ).toBeLessThan(
+      scoreDinnerCandidate(chickenTacos, prefs, new Set(), undefined, picked)
+    );
+  });
+});
+
+describe("withinWeekDiversityPenalty", () => {
+  it("returns 0 when nothing is picked yet", () => {
+    expect(withinWeekDiversityPenalty(dinner({ id: "a" }), [])).toBe(0);
   });
 });

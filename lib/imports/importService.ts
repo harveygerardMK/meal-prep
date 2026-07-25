@@ -1,19 +1,12 @@
 import { randomUUID } from "crypto";
-import { extractRecipeFromText } from "./extractRecipeFromText";
 import { fetchTikTokOEmbed } from "./tiktokOEmbed";
+import { extractRecipeDraft } from "./structureImport";
 import type { RecipeImport } from "./types";
 import { getImport, saveImport } from "@/lib/repositories/importRepository";
-import { addQueueItem } from "@/lib/repositories/queueRepository";
 import { saveCatalogRecipe } from "@/lib/repositories/recipeRepository";
 import { parseCatalogRecipeInput } from "@/lib/recipes/recipeValidation";
-import { weekStartISO } from "@/lib/week";
+import { addRecipeToCurrentWeek } from "@/lib/planGenerator";
 import type { MealKind } from "@/lib/types";
-
-function nextWeekOf(from = new Date()): string {
-  const d = new Date(from);
-  d.setDate(d.getDate() + 7);
-  return weekStartISO(d);
-}
 
 export async function createTikTokImport(input: {
   url: string;
@@ -23,7 +16,7 @@ export async function createTikTokImport(input: {
   const now = new Date().toISOString();
   const oembed = await fetchTikTokOEmbed(input.url);
   const text = [oembed?.title, input.notes].filter(Boolean).join("\n");
-  const extracted = extractRecipeFromText({
+  const extracted = await extractRecipeDraft({
     titleHint: oembed?.title,
     text: text || input.url,
   });
@@ -44,7 +37,9 @@ export async function createTikTokImport(input: {
       protein: extracted.protein ?? "varies",
       cookMinutes: extracted.cookMinutes ?? 30,
     },
-    error: oembed ? undefined : "Could not load TikTok metadata; review using your notes.",
+    error: oembed
+      ? undefined
+      : "Could not load TikTok metadata; review using your notes.",
   };
 
   return saveImport(item);
@@ -65,7 +60,10 @@ export async function updateImportDraft(
   return saveImport(updated);
 }
 
-export async function approveImport(id: string): Promise<RecipeImport> {
+export async function approveImport(
+  id: string,
+  options?: { addToThisWeek?: boolean }
+): Promise<RecipeImport> {
   const existing = await getImport(id);
   if (!existing) throw new Error("Import not found");
 
@@ -88,18 +86,14 @@ export async function approveImport(id: string): Promise<RecipeImport> {
   );
 
   const saved = await saveCatalogRecipe(recipe);
-  await addQueueItem({
-    id: randomUUID(),
-    weekOf: nextWeekOf(),
-    recipeId: saved.id,
-    sourceImportId: existing.id,
-    createdAt: new Date().toISOString(),
-    status: "pending",
-  });
+
+  if (options?.addToThisWeek) {
+    await addRecipeToCurrentWeek(saved.id);
+  }
 
   const updated: RecipeImport = {
     ...existing,
-    status: "queued",
+    status: "approved",
     approvedRecipeId: saved.id,
     updatedAt: new Date().toISOString(),
   };

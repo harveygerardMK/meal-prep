@@ -10,7 +10,7 @@ import {
 import { customDinnerToDinner, dinnerSlotId } from "./dinnerSlot";
 import { weekStartISO } from "./week";
 import { pickDinners, pickLunch } from "./planSelection";
-import { recipeToPlannerViews } from "./recipes/recipeValidation";
+import { parseCatalogRecipeInput, recipeToPlannerViews, slugify } from "./recipes/recipeValidation";
 import { planMonthlyWildcard } from "./planning/wildcard";
 import {
   listPendingForWeek,
@@ -21,6 +21,7 @@ import {
   saveWildcardState,
 } from "./repositories/wildcardStateRepository";
 import { saveCatalogRecipe } from "./repositories/recipeRepository";
+import { inventDinnerForWeek } from "./ai/inventDinner";
 import type {
   CustomDinner,
   CustomDinnerInput,
@@ -38,6 +39,11 @@ export class PlanNotFoundError extends Error {
     this.name = "PlanNotFoundError";
   }
 }
+
+export type RegeneratePlanResult = ResolvedWeekPlan & {
+  aiDinnerName?: string;
+  aiDinnerFailed?: boolean;
+};
 
 export function withConfirmationDefaults(
   plan: WeekPlan
@@ -335,10 +341,102 @@ export async function ensureCurrentPlan(
   return resolvePlan(plan);
 }
 
+async function uniqueAiRecipeId(name: string, existingIds: Set<string>): Promise<string> {
+  const base = slugify(name) || "ai-dinner";
+  if (!existingIds.has(base)) return base;
+  return `${base}-${randomUUID().slice(0, 8)}`;
+}
+
+/**
+ * Replace one unlocked dinner slot with a Workers AI invention saved to the catalog.
+ * On failure, leave the catalog pick in place.
+ */
+export async function injectAiDinnerIntoPlan(
+  plan: WeekPlan,
+  locks: Locks,
+  preferences: WeekPreferences
+): Promise<{ plan: WeekPlan; aiDinnerName?: string; aiDinnerFailed?: boolean }> {
+  const unlockedIndex = plan.dinners.findIndex((_, index) => locks.dinners[index] == null);
+  if (unlockedIndex < 0) {
+    return { plan };
+  }
+
+  const [settings, catalog, history] = await Promise.all([
+    getSettings(),
+    listCatalogRecipes(),
+    getHistory(),
+  ]);
+  const dinnerById = new Map(
+    catalog.filter((recipe) => recipe.kind === "dinner").map((recipe) => [recipe.id, recipe])
+  );
+
+  const avoidNames = new Set<string>();
+  for (const slot of plan.dinners) {
+    if (slot.type === "custom") {
+      avoidNames.add(slot.custom.name);
+      continue;
+    }
+    const recipe = dinnerById.get(slot.recipeId);
+    if (recipe) avoidNames.add(recipe.name);
+  }
+  for (const week of recentWeeks(history, plan.weekOf, settings.noRepeatWeeks)) {
+    for (const slot of week.dinners) {
+      if (slot.type === "custom") {
+        avoidNames.add(slot.custom.name);
+        continue;
+      }
+      const recipe = dinnerById.get(slot.recipeId);
+      if (recipe) avoidNames.add(recipe.name);
+    }
+  }
+
+  try {
+    const draft = await inventDinnerForWeek({
+      avoidNames: [...avoidNames],
+      maxCookMinutes: settings.maxCookMinutes,
+      preferences,
+    });
+    const id = await uniqueAiRecipeId(
+      draft.name,
+      new Set(catalog.map((recipe) => recipe.id))
+    );
+    const recipe = parseCatalogRecipeInput(
+      {
+        id,
+        kind: "dinner",
+        name: draft.name,
+        protein: draft.protein,
+        cookMinutes: draft.cookMinutes,
+        ingredients: draft.ingredients,
+        instructions: draft.instructions,
+        tags: Array.from(new Set(["ai", "generated", ...draft.tags])),
+        status: "active",
+        favorite: false,
+        effortScore: Math.min(5, Math.max(1, Math.round(preferences.cookEffortTarget))),
+        noveltyScore: 5,
+        source: { type: "other" },
+      },
+      { requireId: true }
+    );
+    await saveCatalogRecipe(recipe);
+
+    const dinners = plan.dinners.map((slot, index) =>
+      index === unlockedIndex
+        ? ({ type: "recipe", recipeId: recipe.id } as DinnerSlot)
+        : slot
+    );
+    const nextPlan = clearConfirmation({ ...plan, dinners });
+    await upsertWeekPlan(nextPlan);
+    return { plan: nextPlan, aiDinnerName: recipe.name };
+  } catch {
+    return { plan, aiDinnerFailed: true };
+  }
+}
+
 export async function regenerateCurrentPlan(
   locks: Locks,
   preferences?: WeekPreferences
-): Promise<ResolvedWeekPlan> {
+): Promise<RegeneratePlanResult> {
   const weekOf = weekStartISO();
   const settings = await getSettings();
   const prefs = preferences ?? {
@@ -348,7 +446,13 @@ export async function regenerateCurrentPlan(
   const plan = await buildPlan(weekOf, locks, prefs, {
     avoidCurrentUnlocked: true,
   });
-  return resolvePlan(plan);
+  const withAi = await injectAiDinnerIntoPlan(plan, locks, prefs);
+  const resolved = await resolvePlan(withAi.plan);
+  return {
+    ...resolved,
+    ...(withAi.aiDinnerName ? { aiDinnerName: withAi.aiDinnerName } : {}),
+    ...(withAi.aiDinnerFailed ? { aiDinnerFailed: true } : {}),
+  };
 }
 
 /** Explicit mutation: mark this week's plan as reviewed and finalized. */

@@ -81,7 +81,12 @@ export async function POST(req: NextRequest) {
     const locks = parseLocks(body?.locks);
     const plan = await regenerateCurrentPlan(locks, preferences);
     const groceryList = await groceryListFor(plan);
-    return NextResponse.json({ plan, groceryList });
+    return NextResponse.json({
+      plan,
+      groceryList,
+      ...(plan.aiDinnerName ? { aiDinnerName: plan.aiDinnerName } : {}),
+      ...(plan.aiDinnerFailed ? { aiDinnerFailed: true } : {}),
+    });
   } catch (error) {
     return errorResponse(error);
   }

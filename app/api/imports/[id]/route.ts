@@ -29,7 +29,9 @@ export async function PUT(req: NextRequest, context: RouteContext) {
     const { id } = await context.params;
     const body = await req.json();
     if (body?.action === "approve") {
-      const item = await approveImport(id);
+      const item = await approveImport(id, {
+        addToThisWeek: Boolean(body?.addToThisWeek),
+      });
       return NextResponse.json({ import: item });
     }
     if (!body?.draft) throw new Error("Invalid draft");

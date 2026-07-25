@@ -130,7 +130,9 @@ export default function Home() {
       const lunchesChanged =
         next.plan.girlLunch.id !== beforeGirl ||
         next.plan.boyLunch.id !== beforeBoy;
-      if (dinnersChanged || lunchesChanged) {
+      if (typeof json.aiDinnerName === "string" && json.aiDinnerName) {
+        setStatus(`Plan updated — added AI suggestion: ${json.aiDinnerName}.`);
+      } else if (dinnersChanged || lunchesChanged) {
         setStatus("Plan updated — unlocked meals were reshuffled.");
       } else {
         setStatus(
