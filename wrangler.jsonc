@@ -28,15 +28,9 @@
       "migrations_dir": "migrations"
     }
   ],
-<<<<<<< HEAD
-=======
-  "images": {
-    "binding": "IMAGES"
-  },
   "ai": {
     "binding": "AI"
   },
->>>>>>> 83b68ff (Improve meal variety and TikTok import with Workers AI.)
   "routes": [
     {
       "pattern": "meals.wheresharvey.com",
